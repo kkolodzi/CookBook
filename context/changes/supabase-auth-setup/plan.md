@@ -266,22 +266,22 @@ Not applicable — no schema or data changes in this plan (see F-02 for schema w
 
 #### Automated
 
-- [x] 1.1 `npm run build` succeeds locally with `.dev.vars` populated
-- [x] 1.2 `npm run lint` passes
+- [x] 1.1 `npm run build` succeeds locally with `.dev.vars` populated — 024fce3
+- [x] 1.2 `npm run lint` passes — 024fce3
 
 #### Manual
 
-- [x] 1.3 No "not configured" banner on `/auth/signin` and `/auth/signup` locally
-- [x] 1.4 Sign-up redirects to `/auth/confirm-email` (DEV variant)
-- [x] 1.5 Sign-in redirects to `/dashboard` and the page renders
+- [x] 1.3 No "not configured" banner on `/auth/signin` and `/auth/signup` locally — 024fce3
+- [x] 1.4 Sign-up redirects to `/auth/confirm-email` (DEV variant) — 024fce3
+- [x] 1.5 Sign-in redirects to `/dashboard` and the page renders — 024fce3
 
 ### Phase 2: Production verification/fix
 
 #### Manual
 
-- [ ] 2.1 No "not configured" banner on the deployed signin/signup pages
-- [ ] 2.2 Sign-up against production succeeds (PROD confirm-email variant, non-blocking)
-- [ ] 2.3 Sign-in against production redirects to `/dashboard`
+- [x] 2.1 No "not configured" banner on the deployed signin/signup pages
+- [x] 2.2 Sign-up against production succeeds (PROD confirm-email variant, non-blocking)
+- [x] 2.3 Sign-in against production redirects to `/dashboard`
 
 ### Phase 3: Smoke script + doc note
 

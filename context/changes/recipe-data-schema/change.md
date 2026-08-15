@@ -1,7 +1,7 @@
 ---
 change_id: recipe-data-schema
 title: Recipe data schema — tables, storage bucket, RLS, generated types
-status: implemented
+status: impl_reviewed
 created: 2026-08-15
 updated: 2026-08-15
 archived_at: null
@@ -22,3 +22,9 @@ soft-delete. Currently out of scope — the PRD explicitly makes collections pri
 from actual cookbooks or other people's printed recipes, so redistributing that content
 even post-"deletion" needs real legal/product thought, not a schema-level decision). Revisit
 via `/10x-shape` if this direction is worth pursuing for v2.
+
+**Deferred to S-01 (impl review F2):** `recipes.photo_path` has no constraint tying it to a
+storage object the calling user actually owns. RLS on `recipes` and `storage.objects`
+independently prevents any real cross-user leak, but nothing validates the reference at
+insert time. Not a schema concern — `photo_path` is first written/read in S-01 (photo upload),
+so decide there whether API-layer validation is worth adding.

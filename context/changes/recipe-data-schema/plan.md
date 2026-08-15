@@ -205,6 +205,18 @@ without building any UI yet.
 given user UUID. Run manually, once, via Studio's SQL editor or `supabase db execute` against
 the linked dev project — not part of any automated push, and never run against prod.
 
+#### 3. Addendum: ESLint exclusion for the generated types file (discovered during implementation)
+
+**File**: `eslint.config.js`
+
+**Intent**: `src/types.ts` is Supabase-generated output whose shape (e.g. `type` instead of
+`interface`, index signatures) doesn't match this project's TS-ESLint style rules — without
+this, `npm run lint` fails on a file that would just be re-broken on the next regeneration
+anyway.
+
+**Contract**: `{ ignores: ["src/types.ts"] }` added to the exported config array, ahead of
+`baseConfig` so it applies globally.
+
 ### Success Criteria:
 
 #### Automated Verification:

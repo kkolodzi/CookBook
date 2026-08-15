@@ -29,7 +29,7 @@ Home cooks save recipes on social media but can't find them at meal time — the
 
 | ID   | Change ID                | Outcome (user can …)                                          | Prerequisites | PRD refs                              | Status   |
 | ---- | ------------------------ | --------------------------------------------------------------- | -------------- | -------------------------------------- | -------- |
-| F-01 | supabase-auth-setup      | (foundation) sign-up and sign-in work; users can be persisted    | —              | FR-001, FR-002                         | in-progress |
+| F-01 | supabase-auth-setup      | (foundation) sign-up and sign-in work; users can be persisted    | —              | FR-001, FR-002                         | done |
 | F-02 | recipe-data-schema       | (foundation) recipe schema with structured ingredients landed    | F-01           | FR-015, FR-008, FR-020                 | proposed |
 | S-01 | photo-to-recipe-save     | upload a photo, get an AI-extracted recipe saved to collection  | F-01, F-02     | FR-004, FR-005, FR-008, US-01          | blocked  |
 | S-02 | recipe-search-and-browse | search recipes by ingredient, filter by type, view details       | S-01           | FR-013, FR-015, FR-016, FR-018, US-02  | proposed |
@@ -69,7 +69,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Nothing downstream can be built or verified without a real authenticated user, and auth is currently non-functional (Supabase not configured). This is the first work item regardless of sequencing goal.
-- **Status:** in-progress
+- **Status:** done
 
 ### F-02: Recipe data schema
 
@@ -160,3 +160,5 @@ Foundations below assume these are present and do NOT re-scaffold them.
 ## Done
 
 (Empty on first generation. `/10x-archive` appends an entry here — and flips that item's `Status` to `done` — when a change whose `Change ID` matches the item is archived.)
+
+- **F-01: (foundation) the Supabase project has valid, working credentials in both local dev and the deployed environment; sign-up and sign-in succeed end-to-end; an authenticated user is resolvable via `context.locals.user`.** — Archived 2026-08-15 → `context/archive/2026-08-15-supabase-auth-setup/`. Lesson: —.

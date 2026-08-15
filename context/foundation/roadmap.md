@@ -30,7 +30,7 @@ Home cooks save recipes on social media but can't find them at meal time — the
 | ID   | Change ID                | Outcome (user can …)                                          | Prerequisites | PRD refs                              | Status   |
 | ---- | ------------------------ | --------------------------------------------------------------- | -------------- | -------------------------------------- | -------- |
 | F-01 | supabase-auth-setup      | (foundation) sign-up and sign-in work; users can be persisted    | —              | FR-001, FR-002                         | done |
-| F-02 | recipe-data-schema       | (foundation) recipe schema with structured ingredients landed    | F-01           | FR-015, FR-008, FR-020                 | proposed |
+| F-02 | recipe-data-schema       | (foundation) recipe schema with structured ingredients landed    | F-01           | FR-015, FR-008, FR-020                 | done |
 | S-01 | photo-to-recipe-save     | upload a photo, get an AI-extracted recipe saved to collection  | F-01, F-02     | FR-004, FR-005, FR-008, US-01          | blocked  |
 | S-02 | recipe-search-and-browse | search recipes by ingredient, filter by type, view details       | S-01           | FR-013, FR-015, FR-016, FR-018, US-02  | proposed |
 | S-03 | recipe-edit-and-remove   | edit a saved recipe and remove it reversibly                     | S-01           | FR-019, FR-020                         | proposed |
@@ -83,7 +83,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - How long should a removed recipe remain recoverable (PRD Open Question 1)? — Owner: builder. Block: no — any reasonable default (e.g., 30 days) ships; tunable later if the schema uses a timestamp column rather than a hard TTL.
 - **Risk:** The independently-addressable ingredient constraint (FR-015) is load-bearing — getting it wrong forces a later migration once S-01–S-03 are already built on top of it. Under a speed goal this argues for locking the schema down correctly once rather than iterating on it mid-build.
-- **Status:** proposed
+- **Status:** done
 
 ## Slices
 
@@ -162,3 +162,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 (Empty on first generation. `/10x-archive` appends an entry here — and flips that item's `Status` to `done` — when a change whose `Change ID` matches the item is archived.)
 
 - **F-01: (foundation) the Supabase project has valid, working credentials in both local dev and the deployed environment; sign-up and sign-in succeed end-to-end; an authenticated user is resolvable via `context.locals.user`.** — Archived 2026-08-15 → `context/archive/2026-08-15-supabase-auth-setup/`. Lesson: —.
+- **F-02: (foundation) recipe schema migrated to Supabase: a `recipes` table with name, type, photo reference, and soft-delete markers, plus an independently addressable ingredient list (each ingredient its own row or array element, not a text blob); RLS policies scoped per authenticated user.** — Archived 2026-08-15 → `context/archive/2026-08-15-recipe-data-schema/`. Lesson: —.

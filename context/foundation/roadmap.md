@@ -31,7 +31,7 @@ Home cooks save recipes on social media but can't find them at meal time — the
 | ---- | ------------------------ | --------------------------------------------------------------- | -------------- | -------------------------------------- | -------- |
 | F-01 | supabase-auth-setup      | (foundation) sign-up and sign-in work; users can be persisted    | —              | FR-001, FR-002                         | done |
 | F-02 | recipe-data-schema       | (foundation) recipe schema with structured ingredients landed    | F-01           | FR-015, FR-008, FR-020                 | done |
-| S-01 | photo-to-recipe-save     | upload a photo, get an AI-extracted recipe saved to collection  | F-01, F-02     | FR-004, FR-005, FR-008, US-01          | blocked  |
+| S-01 | photo-to-recipe-save     | upload a photo, get an AI-extracted recipe saved to collection  | F-01, F-02     | FR-004, FR-005, FR-008, US-01          | in-progress |
 | S-02 | recipe-search-and-browse | search recipes by ingredient, filter by type, view details       | S-01           | FR-013, FR-015, FR-016, FR-018, US-02  | proposed |
 | S-03 | recipe-edit-and-remove   | edit a saved recipe and remove it reversibly                     | S-01           | FR-019, FR-020                         | proposed |
 
@@ -99,7 +99,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
   - Which vision API provider to use (and at what cost per extraction call)? — Owner: builder. Block: yes — FR-005 cannot be implemented until a provider is chosen and the integration is scoped.
   - Will the chosen vision API reliably extract ingredients from Polish handwritten or printed recipes? — Owner: builder (validate during implementation with sample photos). Block: no — a quality risk to tune, not a planning blocker.
 - **Risk:** This is both the north star and the riskiest slice — AI extraction quality on Polish recipes is unverified until tested. Under a speed goal, this sits on the strict must-have path — the smallest set of features already marked must-have in the PRD, skipping every nice-to-have — and every other slice depends on it existing, so it cannot be allowed to slip.
-- **Status:** blocked
+- **Status:** in-progress
 
 ### S-02: Recipe search, type filter, and detail view
 

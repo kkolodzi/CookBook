@@ -8,6 +8,44 @@ export type Database = {
   };
   public: {
     Tables: {
+      extraction_attempts: {
+        Row: {
+          created_at: string;
+          failure_reason: Database["public"]["Enums"]["extraction_failure_reason"] | null;
+          id: string;
+          raw_response: Json | null;
+          recipe_id: string | null;
+          success: boolean;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          failure_reason?: Database["public"]["Enums"]["extraction_failure_reason"] | null;
+          id?: string;
+          raw_response?: Json | null;
+          recipe_id?: string | null;
+          success: boolean;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          failure_reason?: Database["public"]["Enums"]["extraction_failure_reason"] | null;
+          id?: string;
+          raw_response?: Json | null;
+          recipe_id?: string | null;
+          success?: boolean;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "extraction_attempts_recipe_id_fkey";
+            columns: ["recipe_id"];
+            isOneToOne: false;
+            referencedRelation: "recipes";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       recipe_ingredients: {
         Row: {
           created_at: string;
@@ -81,6 +119,13 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
+      extraction_failure_reason:
+        | "not_a_recipe"
+        | "blurry_or_low_light"
+        | "cut_off_or_partial"
+        | "handwriting_illegible"
+        | "incomplete_extraction"
+        | "technical_error";
       recipe_type: "dessert" | "soup" | "main_course" | "salad" | "breakfast" | "snack" | "drink" | "other";
     };
     CompositeTypes: {
@@ -651,6 +696,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      extraction_failure_reason: [
+        "not_a_recipe",
+        "blurry_or_low_light",
+        "cut_off_or_partial",
+        "handwriting_illegible",
+        "incomplete_extraction",
+        "technical_error",
+      ],
       recipe_type: ["dessert", "soup", "main_course", "salad", "breakfast", "snack", "drink", "other"],
     },
   },

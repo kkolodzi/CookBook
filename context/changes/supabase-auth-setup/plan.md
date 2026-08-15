@@ -287,9 +287,9 @@ Not applicable — no schema or data changes in this plan (see F-02 for schema w
 
 #### Automated
 
-- [x] 3.1 Smoke script exits `0` against `http://localhost:4321`
-- [x] 3.2 Smoke script exits `0` against `https://snap-recipe.dragonow34.workers.dev`
+- [x] 3.1 Smoke script exits `0` against `http://localhost:4321` — 634ba78
+- [x] 3.2 Smoke script exits `0` against `https://snap-recipe.dragonow34.workers.dev` — 634ba78
 
 #### Manual
 
-- [x] 3.3 `CLAUDE.md` diff reviewed for accuracy
+- [x] 3.3 `CLAUDE.md` diff reviewed for accuracy — 634ba78

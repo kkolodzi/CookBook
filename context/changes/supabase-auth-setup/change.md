@@ -1,7 +1,7 @@
 ---
 change_id: supabase-auth-setup
 title: Configure Supabase project(s) and enable working auth
-status: implementing
+status: implemented
 created: 2026-08-15
 updated: 2026-08-15
 archived_at: null

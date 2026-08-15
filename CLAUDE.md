@@ -50,6 +50,7 @@ Pre-commit hooks: husky + lint-staged runs `eslint --fix` on `*.{ts,tsx,astro}` 
 - Local Supabase: `npx supabase start` (requires Docker)
 - Cloudflare local dev: secrets go in `.dev.vars` (gitignored)
 - Deploy: `npx wrangler deploy` (requires Cloudflare account + `wrangler` auth)
+- Two hosted Supabase projects: `SnapRecipe` (dev — used by `.env`/`.dev.vars` locally) and `SnapRecipe_live` (prod — bound as the deployed Worker's runtime secrets). Target the matching project per environment (e.g. schema migrations).
 
 ## CI
 

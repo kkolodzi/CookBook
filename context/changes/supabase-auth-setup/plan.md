@@ -279,17 +279,17 @@ Not applicable — no schema or data changes in this plan (see F-02 for schema w
 
 #### Manual
 
-- [x] 2.1 No "not configured" banner on the deployed signin/signup pages
-- [x] 2.2 Sign-up against production succeeds (PROD confirm-email variant, non-blocking)
-- [x] 2.3 Sign-in against production redirects to `/dashboard`
+- [x] 2.1 No "not configured" banner on the deployed signin/signup pages — 43f17e5
+- [x] 2.2 Sign-up against production succeeds (PROD confirm-email variant, non-blocking) — 43f17e5
+- [x] 2.3 Sign-in against production redirects to `/dashboard` — 43f17e5
 
 ### Phase 3: Smoke script + doc note
 
 #### Automated
 
-- [ ] 3.1 Smoke script exits `0` against `http://localhost:4321`
-- [ ] 3.2 Smoke script exits `0` against `https://snap-recipe.dragonow34.workers.dev`
+- [x] 3.1 Smoke script exits `0` against `http://localhost:4321`
+- [x] 3.2 Smoke script exits `0` against `https://snap-recipe.dragonow34.workers.dev`
 
 #### Manual
 
-- [ ] 3.3 `CLAUDE.md` diff reviewed for accuracy
+- [x] 3.3 `CLAUDE.md` diff reviewed for accuracy

@@ -306,25 +306,25 @@ JSONB blob.
 
 #### Automated
 
-- [x] 1.1 `supabase login` completed (prerequisite)
-- [x] 1.2 `supabase link --project-ref xmyeeuyeszvpvrjszohr` succeeds
-- [x] 1.3 `supabase db push` applies the migration with exit code 0
+- [x] 1.1 `supabase login` completed (prerequisite) — 53e5079
+- [x] 1.2 `supabase link --project-ref xmyeeuyeszvpvrjszohr` succeeds — 53e5079
+- [x] 1.3 `supabase db push` applies the migration with exit code 0 — 53e5079
 
 #### Manual
 
-- [x] 1.4 Studio (dev): tables + enum exist with expected columns/values
-- [x] 1.5 RLS enabled on both tables
+- [x] 1.4 Studio (dev): tables + enum exist with expected columns/values — 53e5079
+- [x] 1.5 RLS enabled on both tables — 53e5079
 
 ### Phase 2: Storage bucket (dev)
 
 #### Automated
 
-- [ ] 2.1 `supabase db push` applies the migration with exit code 0
+- [x] 2.1 `supabase db push` applies the migration with exit code 0
 
 #### Manual
 
-- [ ] 2.2 Studio (dev): `recipe-photos` bucket exists, not public
-- [ ] 2.3 Storage policies present, one per operation
+- [x] 2.2 Studio (dev): `recipe-photos` bucket exists, not public
+- [x] 2.3 Storage policies present, one per operation
 
 ### Phase 3: Types + seed data (dev only)
 

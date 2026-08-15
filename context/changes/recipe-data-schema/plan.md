@@ -319,25 +319,25 @@ JSONB blob.
 
 #### Automated
 
-- [x] 2.1 `supabase db push` applies the migration with exit code 0
+- [x] 2.1 `supabase db push` applies the migration with exit code 0 — 51a8373
 
 #### Manual
 
-- [x] 2.2 Studio (dev): `recipe-photos` bucket exists, not public
-- [x] 2.3 Storage policies present, one per operation
+- [x] 2.2 Studio (dev): `recipe-photos` bucket exists, not public — 51a8373
+- [x] 2.3 Storage policies present, one per operation — 51a8373
 
 ### Phase 3: Types + seed data (dev only)
 
 #### Automated
 
-- [ ] 3.1 `npm run build` succeeds
-- [ ] 3.2 `npm run lint` passes
+- [x] 3.1 `npm run build` succeeds
+- [x] 3.2 `npm run lint` passes
 
 #### Manual
 
-- [ ] 3.3 Seeded rows queryable and correctly scoped to the seeded user
-- [ ] 3.4 `src/types.ts` reviewed for accuracy
-- [ ] 3.5 Negative RLS check: anon key returns zero rows / permission error
+- [x] 3.3 Seeded rows queryable and correctly scoped to the seeded user
+- [x] 3.4 `src/types.ts` reviewed for accuracy
+- [x] 3.5 Negative RLS check: anon key returns zero rows / permission error
 
 ### Phase 4: Apply to production (`SnapRecipe_live`)
 

@@ -220,6 +220,18 @@ migrations) targets the correct project per environment.
 
 **Contract**: Short addition to the `### Environment` section — no restructuring.
 
+#### 3. Addendum: ESLint scoping for the new script (discovered during implementation)
+
+**File**: `eslint.config.js`
+
+**Intent**: `scripts/check-auth-config.mjs` uses Node globals (`process`, `fetch`, `console`,
+`URL`) that no existing ESLint config block recognized, since this repo had no prior
+Node-context script — without this, `npm run lint` fails with `no-undef` on the new file.
+
+**Contract**: A `nodeScriptsConfig` block scoped to `files: ["scripts/**/*.mjs"]` declaring
+those four globals as `"readonly"`, added to the exported config list. Scoped narrowly so it
+doesn't leak into browser/Astro/React files.
+
 ### Success Criteria:
 
 #### Automated Verification:

@@ -343,12 +343,12 @@ JSONB blob.
 
 #### Automated
 
-- [x] 4.1 `supabase link --project-ref gtrhakzhlammvfifvlyf` succeeds
-- [x] 4.2 `supabase db push` applies both migrations with exit code 0
+- [x] 4.1 `supabase link --project-ref gtrhakzhlammvfifvlyf` succeeds — 8dbb8b6
+- [x] 4.2 `supabase db push` applies both migrations with exit code 0 — 8dbb8b6
 
 #### Manual
 
-- [x] 4.3 Studio (live): schema matches dev
-- [x] 4.4 RLS enabled + storage policies present, matching dev
-- [x] 4.5 `recipes` table is empty in prod (no seed leakage)
-- [x] 4.6 Negative RLS check: live anon key returns zero rows / permission error
+- [x] 4.3 Studio (live): schema matches dev — 8dbb8b6
+- [x] 4.4 RLS enabled + storage policies present, matching dev — 8dbb8b6
+- [x] 4.5 `recipes` table is empty in prod (no seed leakage) — 8dbb8b6
+- [x] 4.6 Negative RLS check: live anon key returns zero rows / permission error — 8dbb8b6

@@ -1,7 +1,7 @@
 ---
 change_id: recipe-data-schema
 title: Recipe data schema — tables, storage bucket, RLS, generated types
-status: implementing
+status: implemented
 created: 2026-08-15
 updated: 2026-08-15
 archived_at: null

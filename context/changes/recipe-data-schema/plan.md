@@ -330,25 +330,25 @@ JSONB blob.
 
 #### Automated
 
-- [x] 3.1 `npm run build` succeeds
-- [x] 3.2 `npm run lint` passes
+- [x] 3.1 `npm run build` succeeds — 2921439
+- [x] 3.2 `npm run lint` passes — 2921439
 
 #### Manual
 
-- [x] 3.3 Seeded rows queryable and correctly scoped to the seeded user
-- [x] 3.4 `src/types.ts` reviewed for accuracy
-- [x] 3.5 Negative RLS check: anon key returns zero rows / permission error
+- [x] 3.3 Seeded rows queryable and correctly scoped to the seeded user — 2921439
+- [x] 3.4 `src/types.ts` reviewed for accuracy — 2921439
+- [x] 3.5 Negative RLS check: anon key returns zero rows / permission error — 2921439
 
 ### Phase 4: Apply to production (`SnapRecipe_live`)
 
 #### Automated
 
-- [ ] 4.1 `supabase link --project-ref gtrhakzhlammvfifvlyf` succeeds
-- [ ] 4.2 `supabase db push` applies both migrations with exit code 0
+- [x] 4.1 `supabase link --project-ref gtrhakzhlammvfifvlyf` succeeds
+- [x] 4.2 `supabase db push` applies both migrations with exit code 0
 
 #### Manual
 
-- [ ] 4.3 Studio (live): schema matches dev
-- [ ] 4.4 RLS enabled + storage policies present, matching dev
-- [ ] 4.5 `recipes` table is empty in prod (no seed leakage)
-- [ ] 4.6 Negative RLS check: live anon key returns zero rows / permission error
+- [x] 4.3 Studio (live): schema matches dev
+- [x] 4.4 RLS enabled + storage policies present, matching dev
+- [x] 4.5 `recipes` table is empty in prod (no seed leakage)
+- [x] 4.6 Negative RLS check: live anon key returns zero rows / permission error

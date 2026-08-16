@@ -455,8 +455,8 @@ against the existing F-02 schema.
 
 #### Automated
 
-- [x] 3.1 `npm run lint` passes
-- [x] 3.2 `npm run build` passes
+- [x] 3.1 `npm run lint` passes — b52daa9
+- [x] 3.2 `npm run build` passes — b52daa9
 
 #### Manual
 

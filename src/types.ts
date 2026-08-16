@@ -290,3 +290,18 @@ export interface RecipeSummaryDto {
   createdAt: string;
   photoUrl: string | null;
 }
+
+export interface RecipeIngredientDto {
+  id: string;
+  name: string;
+  position: number;
+}
+
+export interface RecipeDetailDto {
+  id: string;
+  name: string;
+  type: Database["public"]["Enums"]["recipe_type"];
+  createdAt: string;
+  photoUrl: string | null;
+  ingredients: RecipeIngredientDto[];
+}

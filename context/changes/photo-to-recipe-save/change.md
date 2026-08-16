@@ -1,7 +1,7 @@
 ---
 change_id: photo-to-recipe-save
 title: Photo upload → AI extraction → recipe save
-status: impl_reviewed
+status: implemented
 created: 2026-08-15
 updated: 2026-08-16
 ---

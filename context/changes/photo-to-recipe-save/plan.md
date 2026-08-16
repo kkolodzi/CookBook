@@ -668,10 +668,10 @@ backfill needed.
 
 #### Automated
 
-- [x] 7.1 Type checking passes
-- [x] 7.2 Linting passes
-- [x] 7.3 Integration test: owner PATCH succeeds, non-owner PATCH rejected by RLS
+- [x] 7.1 Type checking passes — 9052db8
+- [x] 7.2 Linting passes — 9052db8
+- [x] 7.3 Integration test: owner PATCH succeeds, non-owner PATCH rejected by RLS — 9052db8
 
 #### Manual
 
-- [x] 7.4 Type nudge confirmed working end-to-end without page reload
+- [x] 7.4 Type nudge confirmed working end-to-end without page reload — 9052db8

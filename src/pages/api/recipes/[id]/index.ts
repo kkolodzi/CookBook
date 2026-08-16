@@ -81,45 +81,18 @@ export const PATCH: APIRoute = async (context) => {
   }
   const { name, type, ingredients } = parsedBody.data;
 
-  const { error: updateError } = await supabase
-    .from("recipes")
-    .update({ name, type })
-    .eq("id", id)
-    .is("deleted_at", null)
-    .select("id")
-    .single();
+  const { data: success, error: editError } = await supabase.rpc("edit_recipe", {
+    p_recipe_id: id,
+    p_name: name,
+    p_type: type,
+    p_ingredients: ingredients,
+  });
 
-  if (updateError) {
+  if (editError) {
+    return jsonResponse({ error: "Wystąpił błąd podczas zapisu przepisu. Spróbuj ponownie." }, 500);
+  }
+  if (!success) {
     return jsonResponse({ error: "Nie znaleziono przepisu." }, 404);
-  }
-
-  const { data: existingIngredients, error: existingError } = await supabase
-    .from("recipe_ingredients")
-    .select("id")
-    .eq("recipe_id", id);
-
-  if (existingError) {
-    return jsonResponse({ error: "Wystąpił błąd podczas zapisu składników. Spróbuj ponownie." }, 500);
-  }
-
-  const newIngredientRows = ingredients.map((ingredientName, position) => ({
-    recipe_id: id,
-    name: ingredientName,
-    position,
-  }));
-
-  const { error: insertError } = await supabase.from("recipe_ingredients").insert(newIngredientRows);
-
-  if (insertError) {
-    return jsonResponse({ error: "Wystąpił błąd podczas zapisu składników. Spróbuj ponownie." }, 500);
-  }
-
-  const oldIds = existingIngredients.map((i) => i.id);
-  if (oldIds.length > 0) {
-    const { error: deleteError } = await supabase.from("recipe_ingredients").delete().in("id", oldIds);
-    if (deleteError) {
-      return jsonResponse({ error: "Wystąpił błąd podczas zapisu składników. Spróbuj ponownie." }, 500);
-    }
   }
 
   return jsonResponse({ id, name, type, ingredients }, 200);

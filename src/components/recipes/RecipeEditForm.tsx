@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CircleAlert, CircleCheck, Loader2, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, CircleAlert, CircleCheck, Loader2, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -36,6 +36,16 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
 
   function addIngredient() {
     setIngredients((prev) => [...prev, ""]);
+  }
+
+  function moveIngredient(index: number, direction: -1 | 1) {
+    setIngredients((prev) => {
+      const target = index + direction;
+      if (target < 0 || target >= prev.length) return prev;
+      const next = [...prev];
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
   }
 
   async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
@@ -147,6 +157,30 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
                 }}
                 placeholder="np. 2 szklanki mąki"
               />
+              <Button
+                type="button"
+                variant="secondary"
+                size="icon"
+                aria-label="Przesuń składnik w górę"
+                onClick={() => {
+                  moveIngredient(index, -1);
+                }}
+                disabled={index === 0}
+              >
+                <ArrowUp className="size-4" />
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                size="icon"
+                aria-label="Przesuń składnik w dół"
+                onClick={() => {
+                  moveIngredient(index, 1);
+                }}
+                disabled={index === ingredients.length - 1}
+              >
+                <ArrowDown className="size-4" />
+              </Button>
               <Button
                 type="button"
                 variant="secondary"

@@ -134,6 +134,15 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      edit_recipe: {
+        Args: {
+          p_recipe_id: string;
+          p_name: string;
+          p_type: Database["public"]["Enums"]["recipe_type"];
+          p_ingredients: string[];
+        };
+        Returns: boolean;
+      };
       reserve_extraction_attempt: { Args: { p_cap: number }; Returns: boolean };
     };
     Enums: {

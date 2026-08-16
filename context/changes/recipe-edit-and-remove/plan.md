@@ -47,6 +47,8 @@ Four vertical phases: backend API first (all CRUD + restore + list/trash endpoin
 
 ### State sequencing (Phase 1 — ingredient full-replace)
 
+> **Addendum (impl-review, 2026-08-16, F2)**: superseded by an atomic Postgres function. The paragraph below describes the original Phase 1 approach (insert-then-delete as two sequential Supabase calls); it was replaced with a single `edit_recipe(p_recipe_id, p_name, p_type, p_ingredients)` `security definer` function (migration `20260816170000_atomic_recipe_ingredient_edit.sql`) that updates the recipe row and replaces its ingredients inside one Postgres transaction, called via `supabase.rpc("edit_recipe", ...)`. This removes the partial-failure window entirely rather than just narrowing it. Kept below for history.
+
 When `PATCH` replaces a recipe's ingredients, insert the new rows **before** deleting the old ones (capture the old ingredient ids first, then insert new rows, then delete by the captured old ids) — not delete-then-insert. This avoids a window where the recipe has zero ingredients if the second operation fails (there's no cross-statement transaction available through the Supabase client here, so ordering is the only guard). Worst case on a failed delete is a few orphaned old rows a user could theoretically see duplicated on retry-free reload; that's an acceptable rare edge case for a single-owner recipe app and self-corrects the next time the recipe is edited.
 
 ## Phase 1: Recipe API — get, edit, remove, restore, list
@@ -73,7 +75,7 @@ All backend surface for this change: fetching a single recipe with its ingredien
 
 **Contract**:
 - `GET` → 200 `{ id, name, type, ingredients: string[] }` for an owned, non-deleted recipe (ingredients ordered by `position`); 404 if not found, not owned, or already soft-deleted.
-- `PATCH` → body `{ name: string, type: RecipeTypeValue, ingredients: string[] }` validated with zod (`name` non-empty trimmed, `type` one of `RECIPE_TYPE_VALUES`, `ingredients` a min-length-1 array of non-empty trimmed strings). Updates `recipes.name`/`recipes.type`, then replaces `recipe_ingredients` per the ordering in "Critical Implementation Details". 400 on validation failure, 404 if not found/owned/already-deleted, 200 with the updated `{ id, name, type, ingredients }` on success.
+- `PATCH` → body `{ name: string, type: RecipeTypeValue, ingredients: string[] }` validated with zod (`name` non-empty trimmed, `type` one of `RECIPE_TYPE_VALUES`, `ingredients` a min-length-1 array of non-empty trimmed strings). Calls the atomic `edit_recipe` Postgres function (see "Critical Implementation Details") to update `recipes.name`/`recipes.type` and replace `recipe_ingredients` in one transaction. 400 on validation failure, 404 if not found/owned/already-deleted, 200 with the updated `{ id, name, type, ingredients }` on success.
 - `DELETE` → sets `deleted_at = now()` on an owned, currently-active recipe. 404 if not found, not owned, or already deleted. 200 with `{ id }` on success.
 
 #### 3. Restore endpoint
@@ -344,9 +346,9 @@ None — no schema changes in this plan.
 
 #### Automated
 
-- [x] 4.1 Type checking passes: `npm run astro check`
-- [x] 4.2 Linting passes: `npm run lint`
-- [x] 4.3 Build succeeds: `npm run build`
+- [x] 4.1 Type checking passes: `npm run astro check` — 3f8b658
+- [x] 4.2 Linting passes: `npm run lint` — 3f8b658
+- [x] 4.3 Build succeeds: `npm run build` — 3f8b658
 
 #### Manual
 

@@ -203,6 +203,16 @@ Foundations below assume these are present and do NOT re-scaffold them.
   ilike construction, and possibly the extraction/storage side too if normalizing at write-time
   turns out to be part of the chosen approach. Needs a `/10x-shape` or `/10x-plan` pass to
   choose an approach before implementing.
+- **[Feature] Paginate/lazy-load the recipe collection instead of a flat 200-row cap** —
+  surfaced during S-02 manual testing (2026-08-16). `listRecipes()` currently fetches up to 200
+  rows in one request (`src/lib/services/recipe-query.ts`), and `RecipeBrowser.tsx` renders the
+  whole result set at once — no pagination, "load more", or infinite scroll, on either mobile or
+  desktop. The plan explicitly scoped this out as a v1 tradeoff ("personal collections aren't
+  expected to approach that size yet"), but real usage may want incremental loading well before
+  200 recipes for a snappier first paint and less scroll-heavy browsing. Needs a `/10x-shape` or
+  `/10x-plan` pass to choose an approach (offset/cursor-based `GET /api/recipes` params +
+  infinite scroll vs. a simpler "load more" button) — a real API contract change, not a
+  UI-only tweak.
 
 ## Parked
 

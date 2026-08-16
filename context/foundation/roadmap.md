@@ -188,6 +188,21 @@ Foundations below assume these are present and do NOT re-scaffold them.
   storage/signed-URL logic in `recipe-query.ts`, the upload flow (`PhotoUploadForm.tsx`), and
   the detail page. Needs a `/10x-shape` pass before scoping — meaningfully bigger than a single
   Slice-sized tweak.
+- **[Bug] Ingredient search misses Polish grammatical-case variants** — surfaced during S-02
+  manual testing (2026-08-16). Search (`FR-015`) is a plain substring `ilike` match with no
+  stemming/lemmatization, so it fails whenever the searched word and the stored word differ by
+  Polish noun declension: "cukier" (nominative) doesn't match an ingredient stored as "cukru"
+  (genitive, e.g. "łyżka cukru"), "masło" doesn't match "masła", etc. — a very common pattern in
+  real Polish recipe text, so this meaningfully undercuts US-02's "find by ingredient" promise.
+  A real fix needs Polish stemming/lemmatization applied to both the stored ingredient text and
+  the search query before comparing (a rule-based suffix-stripping stemmer, or a small
+  dictionary-backed lemmatizer) — not a simple patch. A naive fix (e.g. truncating both sides to
+  a short prefix before comparing) was considered and rejected: it's imprecise, raises false
+  positives on short unrelated words, and doesn't handle vowel-alternation cases (masło→masła)
+  that aren't pure suffix truncation. Touches `src/lib/services/recipe-query.ts`'s `listRecipes`
+  ilike construction, and possibly the extraction/storage side too if normalizing at write-time
+  turns out to be part of the chosen approach. Needs a `/10x-shape` or `/10x-plan` pass to
+  choose an approach before implementing.
 
 ## Parked
 

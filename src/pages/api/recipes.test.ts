@@ -15,9 +15,12 @@ vi.mock("@/lib/services/recipe-extraction", async (importOriginal) => {
   return { ...actual, extractRecipeFromPhoto: vi.fn() };
 });
 
-const { POST } = await import("./recipes");
+vi.mock("@/lib/services/recipe-query", () => ({ listRecipes: vi.fn() }));
+
+const { GET, POST } = await import("./recipes");
 const { createClient } = await import("@/lib/supabase");
 const { extractRecipeFromPhoto } = await import("@/lib/services/recipe-extraction");
+const { listRecipes } = await import("@/lib/services/recipe-query");
 
 interface MockSupabaseConfig {
   reserveResult?: { data: boolean | null; error?: unknown };
@@ -61,12 +64,21 @@ function mockSupabaseClient(config: MockSupabaseConfig = {}) {
   return { from, rpc, storage, extractionAttemptsChain, recipesChain, ingredientsChain, upload, remove };
 }
 
-function makeContext(options: { user?: { id: string } | null; formData?: FormData }): APIContext {
+function makeContext(options: {
+  user?: { id: string } | null;
+  formData?: FormData;
+  searchParams?: Record<string, string>;
+}): APIContext {
   const formData = options.formData ?? new FormData();
+  const url = new URL("http://localhost/api/recipes");
+  for (const [key, value] of Object.entries(options.searchParams ?? {})) {
+    url.searchParams.set(key, value);
+  }
   return {
     locals: { user: options.user === undefined ? { id: "user-1" } : options.user },
     request: { formData: () => Promise.resolve(formData), headers: new Headers() } as unknown as Request,
     cookies: {} as APIContext["cookies"],
+    url,
   } as unknown as APIContext;
 }
 
@@ -82,6 +94,7 @@ describe("POST /api/recipes", () => {
   beforeEach(() => {
     vi.mocked(createClient).mockReset();
     vi.mocked(extractRecipeFromPhoto).mockReset();
+    vi.mocked(listRecipes).mockReset();
   });
 
   it("returns 401 for an unauthenticated request", async () => {
@@ -225,5 +238,59 @@ describe("POST /api/recipes", () => {
     expect(client.extractionAttemptsChain.insert).toHaveBeenCalledWith(
       expect.objectContaining({ success: false, failure_reason: "technical_error" }),
     );
+  });
+});
+
+describe("GET /api/recipes", () => {
+  beforeEach(() => {
+    vi.mocked(createClient).mockReset();
+    vi.mocked(listRecipes).mockReset();
+  });
+
+  it("returns 401 for an unauthenticated request", async () => {
+    const response = await GET(makeContext({ user: null }));
+
+    expect(response.status).toBe(401);
+    expect(listRecipes).not.toHaveBeenCalled();
+  });
+
+  it("returns 503 when Supabase is not configured", async () => {
+    vi.mocked(createClient).mockReturnValue(null);
+
+    const response = await GET(makeContext({}));
+
+    expect(response.status).toBe(503);
+  });
+
+  it("forwards an empty query and returns the recipes from the service", async () => {
+    vi.mocked(createClient).mockReturnValue(mockSupabaseClient() as never);
+    vi.mocked(listRecipes).mockResolvedValue([
+      { id: "recipe-1", name: "Zupa", type: "soup", createdAt: "2026-08-16T00:00:00.000Z", photoUrl: null },
+    ]);
+
+    const response = await GET(makeContext({}));
+    const body = (await response.json()) as { recipes: unknown[] };
+
+    expect(response.status).toBe(200);
+    expect(listRecipes).toHaveBeenCalledWith(expect.anything(), "user-1", {});
+    expect(body.recipes).toHaveLength(1);
+  });
+
+  it("forwards a trimmed q and a type filter to the service", async () => {
+    vi.mocked(createClient).mockReturnValue(mockSupabaseClient() as never);
+    vi.mocked(listRecipes).mockResolvedValue([]);
+
+    await GET(makeContext({ searchParams: { q: "marchewka", type: "soup" } }));
+
+    expect(listRecipes).toHaveBeenCalledWith(expect.anything(), "user-1", { q: "marchewka", type: "soup" });
+  });
+
+  it("returns 400 for an invalid type value", async () => {
+    vi.mocked(createClient).mockReturnValue(mockSupabaseClient() as never);
+
+    const response = await GET(makeContext({ searchParams: { type: "not-a-real-type" } }));
+
+    expect(response.status).toBe(400);
+    expect(listRecipes).not.toHaveBeenCalled();
   });
 });

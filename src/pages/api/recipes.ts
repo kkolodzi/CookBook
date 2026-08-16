@@ -2,12 +2,20 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase";
 import { extractRecipeFromPhoto, SUPPORTED_MIME_TYPES } from "@/lib/services/recipe-extraction";
+import { listRecipes } from "@/lib/services/recipe-query";
+import { RECIPE_TYPE_VALUES } from "@/components/recipes/recipe-type-labels";
 import type { Json } from "@/types";
 
 export const prerender = false;
 
 const DAILY_ATTEMPT_CAP = 10;
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+const MAX_QUERY_LENGTH = 200;
+
+const listQuerySchema = z.object({
+  q: z.string().trim().max(MAX_QUERY_LENGTH, { message: "Zapytanie jest za długie." }).optional(),
+  type: z.enum(RECIPE_TYPE_VALUES, { message: "Nieprawidłowy typ przepisu." }).optional(),
+});
 
 const photoSchema = z
   .instanceof(File, { message: "Brak pliku zdjęcia." })
@@ -25,6 +33,29 @@ function jsonResponse(body: unknown, status: number): Response {
 function extensionFromMimeType(mimeType: string): string {
   return mimeType === "image/png" ? "png" : "jpg";
 }
+
+export const GET: APIRoute = async (context) => {
+  const user = context.locals.user;
+  if (!user) {
+    return jsonResponse({ error: "Musisz się zalogować, aby zobaczyć przepisy." }, 401);
+  }
+
+  const supabase = createClient(context.request.headers, context.cookies);
+  if (!supabase) {
+    return jsonResponse({ error: "Usługa jest tymczasowo niedostępna." }, 503);
+  }
+
+  const parsedQuery = listQuerySchema.safeParse({
+    q: context.url.searchParams.get("q") ?? undefined,
+    type: context.url.searchParams.get("type") ?? undefined,
+  });
+  if (!parsedQuery.success) {
+    return jsonResponse({ error: parsedQuery.error.issues[0].message }, 400);
+  }
+
+  const recipes = await listRecipes(supabase, user.id, parsedQuery.data);
+  return jsonResponse({ recipes }, 200);
+};
 
 export const POST: APIRoute = async (context) => {
   const user = context.locals.user;

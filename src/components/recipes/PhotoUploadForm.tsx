@@ -3,6 +3,8 @@ import { ImagePlus, Loader2, CircleCheck, CircleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { RECIPE_TYPE_LABELS, type RecipeTypeValue } from "@/components/recipes/recipe-type-labels";
+import { EXTRACTION_FAILURE_COPY, type UploadFailureKey } from "@/components/recipes/extraction-failure-copy";
+import type { ExtractionFailureReason } from "@/lib/services/recipe-extraction";
 
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 const ACCEPTED_MIME_TYPES = ["image/jpeg", "image/png"];
@@ -22,14 +24,11 @@ interface SuccessData {
   typeUnconfirmed: boolean;
 }
 
-interface ErrorInfo {
-  reason: string;
-  message: string;
-}
+type ErrorInfo = { kind: "reason"; reason: UploadFailureKey } | { kind: "message"; message: string };
 
 type ApiResponseBody =
   | { success: true; recipe: SavedRecipe; typeUnconfirmed: boolean }
-  | { success: false; reason: string }
+  | { success: false; reason: ExtractionFailureReason }
   | { error: string };
 
 export default function PhotoUploadForm() {
@@ -72,10 +71,11 @@ export default function PhotoUploadForm() {
       const body = (await response.json().catch(() => null)) as ApiResponseBody | null;
 
       if (!response.ok || !body) {
-        setErrorInfo({
-          reason: response.status === 429 ? "rate_limited" : "network_error",
-          message: body && "error" in body ? body.error : GENERIC_ERROR_MESSAGE,
-        });
+        if (response.status === 429) {
+          setErrorInfo({ kind: "reason", reason: "rate_limited" });
+        } else {
+          setErrorInfo({ kind: "message", message: body && "error" in body ? body.error : GENERIC_ERROR_MESSAGE });
+        }
         setStatus("error");
         return;
       }
@@ -87,15 +87,15 @@ export default function PhotoUploadForm() {
       }
 
       if ("success" in body) {
-        setErrorInfo({ reason: body.reason, message: GENERIC_ERROR_MESSAGE });
+        setErrorInfo({ kind: "reason", reason: body.reason });
         setStatus("error");
         return;
       }
 
-      setErrorInfo({ reason: "network_error", message: GENERIC_ERROR_MESSAGE });
+      setErrorInfo({ kind: "reason", reason: "network_error" });
       setStatus("error");
     } catch {
-      setErrorInfo({ reason: "network_error", message: GENERIC_ERROR_MESSAGE });
+      setErrorInfo({ kind: "reason", reason: "network_error" });
       setStatus("error");
     }
   }
@@ -138,12 +138,19 @@ export default function PhotoUploadForm() {
   }
 
   if (status === "error" && errorInfo) {
+    const { title, tip } =
+      errorInfo.kind === "reason"
+        ? EXTRACTION_FAILURE_COPY[errorInfo.reason]
+        : { title: GENERIC_ERROR_MESSAGE, tip: errorInfo.message };
     return (
       <div className="space-y-4 text-white">
-        <p className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">
-          <CircleAlert className="size-4 shrink-0" />
-          {errorInfo.message}
-        </p>
+        <div className="space-y-1 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">
+          <p className="flex items-center gap-2 font-medium">
+            <CircleAlert className="size-4 shrink-0" />
+            {title}
+          </p>
+          <p className="text-red-200/90">{tip}</p>
+        </div>
         <Button onClick={reset} className="w-full rounded-lg bg-purple-600 hover:bg-purple-500">
           Spróbuj ponownie
         </Button>

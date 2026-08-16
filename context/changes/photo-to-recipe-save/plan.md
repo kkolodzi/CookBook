@@ -645,24 +645,24 @@ backfill needed.
 
 #### Automated
 
-- [x] 5.1 Type checking passes
-- [x] 5.2 Linting passes
+- [x] 5.1 Type checking passes — 8fe87e3
+- [x] 5.2 Linting passes — 8fe87e3
 
 #### Manual
 
-- [x] 5.3 Mobile-width upload flow verified one-handed, loading + success states correct
-- [x] 5.4 Quality-validation pass: 5-10 real Polish recipe photos, accuracy recorded
+- [x] 5.3 Mobile-width upload flow verified one-handed, loading + success states correct — 8fe87e3
+- [x] 5.4 Quality-validation pass: 5-10 real Polish recipe photos, accuracy recorded — 8fe87e3
 
 ### Phase 6: Failure & Retry UX
 
 #### Automated
 
-- [ ] 6.1 Type checking passes
-- [ ] 6.2 Linting passes
+- [x] 6.1 Type checking passes
+- [x] 6.2 Linting passes
 
 #### Manual
 
-- [ ] 6.3 Non-recipe and blurry-photo failure tips verified; retry button resets cleanly
+- [x] 6.3 Non-recipe and blurry-photo failure tips verified; retry button resets cleanly
 
 ### Phase 7: Type-Confirmation Nudge (cuttable first if time is short)
 

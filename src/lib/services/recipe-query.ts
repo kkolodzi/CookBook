@@ -63,7 +63,7 @@ export async function listRecipes(
     .order("created_at", { ascending: false })
     .limit(LIST_RESULT_CAP);
 
-  if (hasQuery) {
+  if (trimmedQuery) {
     const escapedQuery = trimmedQuery.replace(/[\\%_]/g, (match) => `\\${match}`);
     query = query.ilike("recipe_ingredients.name", `%${escapedQuery}%`);
   }

@@ -11,7 +11,7 @@ export type ExtractionResult =
 
 const EXTRACTION_TIMEOUT_MS = 10_000;
 const OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
-const SUPPORTED_MIME_TYPES = ["image/jpeg", "image/png"];
+export const SUPPORTED_MIME_TYPES: readonly string[] = ["image/jpeg", "image/png"];
 
 const RECIPE_TYPES = [
   "dessert",
@@ -81,13 +81,15 @@ export async function extractRecipeFromPhoto(imageBytes: ArrayBuffer, mimeType: 
     return { success: false, reason: "technical_error", raw: null };
   }
 
-  const dataUrl = `data:${mimeType};base64,${arrayBufferToBase64(imageBytes)}`;
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => {
-    controller.abort();
-  }, EXTRACTION_TIMEOUT_MS);
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
   try {
+    const dataUrl = `data:${mimeType};base64,${arrayBufferToBase64(imageBytes)}`;
+    const controller = new AbortController();
+    timeoutId = setTimeout(() => {
+      controller.abort();
+    }, EXTRACTION_TIMEOUT_MS);
+
     const response = await fetch(OPENROUTER_ENDPOINT, {
       method: "POST",
       headers: {

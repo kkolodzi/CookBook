@@ -620,13 +620,13 @@ backfill needed.
 
 #### Automated
 
-- [ ] 3.1 Type checking passes
-- [ ] 3.2 Linting passes
-- [ ] 3.3 Integration test: 401/400/429 paths and successful extraction pass-through
+- [x] 3.1 Type checking passes
+- [x] 3.2 Linting passes
+- [x] 3.3 Integration test: 401/400/429 paths and successful extraction pass-through
 
 #### Manual
 
-- [ ] 3.4 REST client confirms 401/400/429 paths return expected Polish messages
+- [x] 3.4 REST client confirms 401/400/429 paths return expected Polish messages
 
 ### Phase 4: API Route — Persistence
 

@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import type { RecipeSummaryDto } from "@/types";
 
 const DEBOUNCE_MS = 300;
+const MIN_QUERY_LENGTH = 3;
 
 interface RecipeBrowserProps {
   initialRecipes: RecipeSummaryDto[];
@@ -29,6 +30,11 @@ export default function RecipeBrowser({ initialRecipes }: RecipeBrowserProps) {
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
+      return;
+    }
+
+    const trimmedForGate = query.trim();
+    if (trimmedForGate.length > 0 && trimmedForGate.length < MIN_QUERY_LENGTH) {
       return;
     }
 
@@ -76,7 +82,7 @@ export default function RecipeBrowser({ initialRecipes }: RecipeBrowserProps) {
           onChange={(e) => {
             setQuery(e.target.value);
           }}
-          placeholder="Szukaj po składniku, np. marchewka"
+          placeholder="Szukaj po składniku (min. 3 znaki), np. marchewka"
           className="border-white/10 bg-white/10 pl-9 text-white placeholder:text-white/40"
         />
       </div>

@@ -329,9 +329,9 @@ None — no schema changes in this plan.
 
 #### Automated
 
-- [x] 3.1 Type checking passes: `npm run astro check`
-- [x] 3.2 Linting passes: `npm run lint`
-- [x] 3.3 Build succeeds: `npm run build`
+- [x] 3.1 Type checking passes: `npm run astro check` — 41c0d0c
+- [x] 3.2 Linting passes: `npm run lint` — 41c0d0c
+- [x] 3.3 Build succeeds: `npm run build` — 41c0d0c
 
 #### Manual
 
@@ -344,9 +344,9 @@ None — no schema changes in this plan.
 
 #### Automated
 
-- [ ] 4.1 Type checking passes: `npm run astro check`
-- [ ] 4.2 Linting passes: `npm run lint`
-- [ ] 4.3 Build succeeds: `npm run build`
+- [x] 4.1 Type checking passes: `npm run astro check`
+- [x] 4.2 Linting passes: `npm run lint`
+- [x] 4.3 Build succeeds: `npm run build`
 
 #### Manual
 

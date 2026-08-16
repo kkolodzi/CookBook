@@ -1,0 +1,49 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import TrashList from "@/components/recipes/TrashList";
+import { createClient } from "@/lib/supabase";
+import type { RecipeTypeValue } from "@/components/recipes/recipe-type-labels";
+
+interface TrashListItem {
+  id: string;
+  name: string;
+  type: RecipeTypeValue;
+}
+
+let recipes: TrashListItem[] = [];
+let loadError: string | null = null;
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+if (!supabase) {
+  loadError = "Usługa jest tymczasowo niedostępna.";
+} else {
+  const { data, error } = await supabase
+    .from("recipes")
+    .select("id, name, type")
+    .not("deleted_at", "is", null)
+    .order("deleted_at", { ascending: false });
+
+  if (error) {
+    loadError = "Nie udało się wczytać kosza. Spróbuj ponownie.";
+  } else {
+    recipes = data;
+  }
+}
+---
+
+<Layout title="Kosz">
+  <div class="bg-cosmic min-h-screen p-4">
+    <div class="mx-auto w-full max-w-2xl space-y-6 py-8">
+      <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
+        Kosz
+      </h1>
+
+      {loadError && <p class="text-sm text-red-300">{loadError}</p>}
+      {!loadError && <TrashList client:load recipes={recipes} />}
+
+      <a href="/recipes" class="inline-block text-sm text-blue-100/70 underline hover:text-white">
+        ← Wróć do listy przepisów
+      </a>
+    </div>
+  </div>
+</Layout>

@@ -311,7 +311,7 @@ None — no schema changes in this plan.
 
 #### Manual
 
-- [ ] 1.4 GET/PATCH/DELETE/restore endpoints verified end-to-end via browser or REST client
+- [x] 1.4 GET/PATCH/DELETE/restore endpoints verified end-to-end via browser or REST client
 
 ### Phase 2: Recipe list page
 
@@ -323,9 +323,9 @@ None — no schema changes in this plan.
 
 #### Manual
 
-- [ ] 2.4 `/recipes` lists active recipes newest-first
-- [ ] 2.5 Remove flow (confirm dialog → removal) works
-- [ ] 2.6 Dashboard link to `/recipes` works
+- [x] 2.4 `/recipes` lists active recipes newest-first
+- [x] 2.5 Remove flow (confirm dialog → removal) works
+- [x] 2.6 Dashboard link to `/recipes` works
 
 ### Phase 3: Recipe detail and edit page
 
@@ -337,10 +337,10 @@ None — no schema changes in this plan.
 
 #### Manual
 
-- [ ] 3.4 `/recipes/[id]` pre-fills name/type/ingredients for an owned recipe
-- [ ] 3.5 Editing name, type, and ingredients (add + remove) persists after reload
-- [ ] 3.6 Saving with zero ingredients is blocked
-- [ ] 3.7 A foreign or soft-deleted recipe id is inaccessible at `/recipes/[id]`
+- [x] 3.4 `/recipes/[id]` pre-fills name/type/ingredients for an owned recipe
+- [x] 3.5 Editing name, type, and ingredients (add + remove) persists after reload
+- [x] 3.6 Saving with zero ingredients is blocked
+- [x] 3.7 A foreign or soft-deleted recipe id is inaccessible at `/recipes/[id]`
 
 ### Phase 4: Trash view and restore
 
@@ -352,6 +352,6 @@ None — no schema changes in this plan.
 
 #### Manual
 
-- [ ] 4.4 Removed recipes appear in `/recipes/trash`
-- [ ] 4.5 Restore returns a recipe to `/recipes` and removes it from the trash
-- [ ] 4.6 Link from `/recipes` to `/recipes/trash` works
+- [x] 4.4 Removed recipes appear in `/recipes/trash`
+- [x] 4.5 Restore returns a recipe to `/recipes` and removes it from the trash
+- [x] 4.6 Link from `/recipes` to `/recipes/trash` works

@@ -1,0 +1,201 @@
+import React, { useRef, useState } from "react";
+import { ImagePlus, Loader2, CircleCheck, CircleAlert } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { RECIPE_TYPE_LABELS, type RecipeTypeValue } from "@/components/recipes/recipe-type-labels";
+
+const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+const ACCEPTED_MIME_TYPES = ["image/jpeg", "image/png"];
+const GENERIC_ERROR_MESSAGE = "Nie udało się zapisać przepisu. Spróbuj ponownie.";
+
+type Status = "idle" | "loading" | "success" | "error";
+
+interface SavedRecipe {
+  id: string;
+  name: string;
+  type: RecipeTypeValue;
+  ingredients: string[];
+}
+
+interface SuccessData {
+  recipe: SavedRecipe;
+  typeUnconfirmed: boolean;
+}
+
+interface ErrorInfo {
+  reason: string;
+  message: string;
+}
+
+type ApiResponseBody =
+  | { success: true; recipe: SavedRecipe; typeUnconfirmed: boolean }
+  | { success: false; reason: string }
+  | { error: string };
+
+export default function PhotoUploadForm() {
+  const [status, setStatus] = useState<Status>("idle");
+  const [file, setFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [successData, setSuccessData] = useState<SuccessData | null>(null);
+  const [errorInfo, setErrorInfo] = useState<ErrorInfo | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const selected = e.target.files?.[0] ?? null;
+    if (!selected) {
+      setFile(null);
+      return;
+    }
+    if (!ACCEPTED_MIME_TYPES.includes(selected.type)) {
+      setFile(null);
+      setFileError("Wybierz zdjęcie w formacie JPEG lub PNG.");
+      return;
+    }
+    if (selected.size > MAX_FILE_SIZE_BYTES) {
+      setFile(null);
+      setFileError("Zdjęcie jest za duże — maksymalny rozmiar to 5MB.");
+      return;
+    }
+    setFileError(null);
+    setFile(selected);
+  }
+
+  async function handleSubmit() {
+    if (!file) return;
+    setStatus("loading");
+
+    const formData = new FormData();
+    formData.set("photo", file);
+
+    try {
+      const response = await fetch("/api/recipes", { method: "POST", body: formData });
+      const body = (await response.json().catch(() => null)) as ApiResponseBody | null;
+
+      if (!response.ok || !body) {
+        setErrorInfo({
+          reason: response.status === 429 ? "rate_limited" : "network_error",
+          message: body && "error" in body ? body.error : GENERIC_ERROR_MESSAGE,
+        });
+        setStatus("error");
+        return;
+      }
+
+      if ("success" in body && body.success) {
+        setSuccessData({ recipe: body.recipe, typeUnconfirmed: body.typeUnconfirmed });
+        setStatus("success");
+        return;
+      }
+
+      if ("success" in body) {
+        setErrorInfo({ reason: body.reason, message: GENERIC_ERROR_MESSAGE });
+        setStatus("error");
+        return;
+      }
+
+      setErrorInfo({ reason: "network_error", message: GENERIC_ERROR_MESSAGE });
+      setStatus("error");
+    } catch {
+      setErrorInfo({ reason: "network_error", message: GENERIC_ERROR_MESSAGE });
+      setStatus("error");
+    }
+  }
+
+  function reset() {
+    setStatus("idle");
+    setFile(null);
+    setFileError(null);
+    setSuccessData(null);
+    setErrorInfo(null);
+    if (inputRef.current) inputRef.current.value = "";
+  }
+
+  if (status === "success" && successData) {
+    return (
+      <div className="space-y-4 text-white">
+        <div className="flex items-center gap-2 text-green-300">
+          <CircleCheck className="size-5" />
+          <p className="font-medium">Przepis zapisany!</p>
+        </div>
+        <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+          <p className="text-lg font-semibold">{successData.recipe.name}</p>
+          <p className="text-sm text-blue-100/70">{RECIPE_TYPE_LABELS[successData.recipe.type]}</p>
+          <ul className="mt-3 list-inside list-disc space-y-1 text-sm text-blue-100/80">
+            {successData.recipe.ingredients.map((ingredient) => (
+              <li key={ingredient}>{ingredient}</li>
+            ))}
+          </ul>
+        </div>
+        {successData.typeUnconfirmed && (
+          <p className="rounded-lg border border-yellow-400/30 bg-yellow-900/20 px-3 py-2 text-sm text-yellow-200">
+            Nie udało się jednoznacznie rozpoznać typu dania — zapisano jako „Inne”.
+          </p>
+        )}
+        <Button onClick={reset} variant="secondary" className="w-full">
+          Dodaj kolejny przepis
+        </Button>
+      </div>
+    );
+  }
+
+  if (status === "error" && errorInfo) {
+    return (
+      <div className="space-y-4 text-white">
+        <p className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">
+          <CircleAlert className="size-4 shrink-0" />
+          {errorInfo.message}
+        </p>
+        <Button onClick={reset} className="w-full rounded-lg bg-purple-600 hover:bg-purple-500">
+          Spróbuj ponownie
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <label
+        htmlFor="photo"
+        className={cn(
+          "flex min-h-48 cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-white/20 p-6 text-center text-white transition-colors hover:border-purple-400/60",
+          status === "loading" && "pointer-events-none opacity-60",
+        )}
+      >
+        <ImagePlus className="size-10 text-white/50" />
+        <span className="text-sm text-blue-100/70">{file ? file.name : "Wybierz zdjęcie przepisu"}</span>
+        <input
+          ref={inputRef}
+          id="photo"
+          name="photo"
+          type="file"
+          accept="image/jpeg,image/png"
+          className="sr-only"
+          onChange={handleFileChange}
+          disabled={status === "loading"}
+        />
+      </label>
+
+      {fileError && (
+        <p className="flex items-center gap-2 text-xs text-red-300">
+          <CircleAlert className="size-3" />
+          {fileError}
+        </p>
+      )}
+
+      <Button
+        type="button"
+        onClick={handleSubmit}
+        disabled={!file || status === "loading"}
+        className="w-full rounded-lg bg-purple-600 px-4 py-2 font-medium text-white transition-colors hover:bg-purple-500"
+      >
+        {status === "loading" ? (
+          <span className="flex items-center gap-2">
+            <Loader2 className="size-4 animate-spin" />
+            Analizujemy zdjęcie — to może potrwać do 10 sekund...
+          </span>
+        ) : (
+          "Prześlij zdjęcie"
+        )}
+      </Button>
+    </div>
+  );
+}

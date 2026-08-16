@@ -14,14 +14,22 @@ const { user } = Astro.locals;
         Welcome, <span class="font-semibold text-white">{user?.email}</span>
       </p>
       <p class="mt-2 text-sm text-blue-100/50">This page is only for authenticated users.</p>
-      <form method="POST" action="/api/auth/signout" class="mt-6">
-        <button
-          type="submit"
-          class="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/20"
+      <div class="mt-6 flex flex-col gap-3">
+        <a
+          href="/recipes/new"
+          class="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-500"
         >
-          Sign out
-        </button>
-      </form>
+          Dodaj przepis ze zdjęcia
+        </a>
+        <form method="POST" action="/api/auth/signout">
+          <button
+            type="submit"
+            class="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/20"
+          >
+            Sign out
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 </Layout>

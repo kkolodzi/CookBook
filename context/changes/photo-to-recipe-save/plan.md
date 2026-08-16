@@ -632,26 +632,26 @@ backfill needed.
 
 #### Automated
 
-- [x] 4.1 Type checking passes
-- [x] 4.2 Linting passes
-- [x] 4.3 Integration test: successful save produces consistent recipe/ingredients/storage/attempt rows
-- [x] 4.4 Integration test: ingredients-insert failure triggers compensating recipe delete
+- [x] 4.1 Type checking passes — 2b4c3b0
+- [x] 4.2 Linting passes — 2b4c3b0
+- [x] 4.3 Integration test: successful save produces consistent recipe/ingredients/storage/attempt rows — 2b4c3b0
+- [x] 4.4 Integration test: ingredients-insert failure triggers compensating recipe delete — 2b4c3b0
 
 #### Manual
 
-- [x] 4.5 Real photo submission via dev server verified end-to-end in Supabase dashboard
+- [x] 4.5 Real photo submission via dev server verified end-to-end in Supabase dashboard — 2b4c3b0
 
 ### Phase 5: Upload UI — Happy Path
 
 #### Automated
 
-- [ ] 5.1 Type checking passes
-- [ ] 5.2 Linting passes
+- [x] 5.1 Type checking passes
+- [x] 5.2 Linting passes
 
 #### Manual
 
-- [ ] 5.3 Mobile-width upload flow verified one-handed, loading + success states correct
-- [ ] 5.4 Quality-validation pass: 5-10 real Polish recipe photos, accuracy recorded
+- [x] 5.3 Mobile-width upload flow verified one-handed, loading + success states correct
+- [x] 5.4 Quality-validation pass: 5-10 real Polish recipe photos, accuracy recorded
 
 ### Phase 6: Failure & Retry UX
 

@@ -175,6 +175,19 @@ Foundations below assume these are present and do NOT re-scaffold them.
   target after auth), `src/pages/auth/signin.astro`'s post-login redirect, and possibly removes
   `src/pages/dashboard.astro` entirely. Needs a `/10x-shape` or `/10x-plan` pass to decide
   between "redirect only" vs. "merge dashboard into /recipes".
+- **[Feature] Multiple photos per recipe, not all "the recipe card"** — surfaced during S-02
+  manual testing (2026-08-16). Today a recipe has exactly one `photo_path` (F-02 schema),
+  captured once at save time (S-01) and treated as *the* source image. Idea: let a user attach
+  several images to one recipe, where only one (or none) needs to be the original recipe
+  card/text — others could be a photo of the finished dish, a prep/ingredients-laid-out shot, or
+  an in-progress step photo. Raises real design questions: does extraction (S-01) still run
+  against just the first/primary photo, or could multiple photos each contribute ingredients
+  (e.g. one photo of the card + one of a handwritten addition)? Does the detail view (S-02) need
+  a gallery/carousel instead of a single `<img>`? Affects F-02's schema (photo_path would need
+  to become a one-to-many `recipe_photos` table, likely with a "primary/card" flag), the
+  storage/signed-URL logic in `recipe-query.ts`, the upload flow (`PhotoUploadForm.tsx`), and
+  the detail page. Needs a `/10x-shape` pass before scoping — meaningfully bigger than a single
+  Slice-sized tweak.
 
 ## Parked
 

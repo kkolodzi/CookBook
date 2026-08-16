@@ -3,6 +3,7 @@ import Layout from "@/layouts/Layout.astro";
 import { createClient } from "@/lib/supabase";
 import { getRecipeDetail } from "@/lib/services/recipe-query";
 import { RECIPE_TYPE_LABELS } from "@/components/recipes/recipe-type-labels";
+import RecipeRemoveButton from "@/components/recipes/RecipeRemoveButton";
 import type { RecipeDetailDto } from "@/types";
 
 async function loadRecipe(): Promise<{ status: number; message: string; recipe: RecipeDetailDto | null }> {
@@ -55,12 +56,15 @@ Astro.response.status = status;
                   </h1>
                   <p class="mt-1 text-sm text-blue-100/70">{RECIPE_TYPE_LABELS[recipe.type]}</p>
                 </div>
-                <a
-                  href={`/recipes/${recipe.id}/edit`}
-                  class="shrink-0 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20"
-                >
-                  Edytuj
-                </a>
+                <div class="flex shrink-0 items-center gap-2">
+                  <a
+                    href={`/recipes/${recipe.id}/edit`}
+                    class="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20"
+                  >
+                    Edytuj
+                  </a>
+                  <RecipeRemoveButton client:load recipeId={recipe.id} recipeName={recipe.name} />
+                </div>
               </div>
               <div>
                 <h2 class="text-sm font-semibold text-blue-100/70">Składniki</h2>

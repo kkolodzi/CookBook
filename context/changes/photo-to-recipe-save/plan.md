@@ -244,6 +244,19 @@ codebase.
 
 **Contract**: `npm install zod`.
 
+#### 5. Test infrastructure (addendum — added during implementation)
+
+**Files**: `vitest.config.ts`, `src/lib/services/recipe-extraction.test.ts`, `package.json`
+(`test` script, `vitest` dev dependency)
+
+**Intent**: This phase's Success Criteria require unit tests for `extractRecipeFromPhoto`, but
+the repo had no test runner at all. Discovered mid-phase; user explicitly chose to adapt (set up
+vitest now) rather than skip the tests or replan. Not part of the original plan — recorded here
+as an addendum so the plan reflects what was actually built.
+
+**Contract**: Standard vitest config (`node` environment, `@` path alias matching tsconfig);
+4 unit tests covering the cases listed in Testing Strategy below.
+
 ### Success Criteria:
 
 #### Automated Verification:
@@ -595,13 +608,13 @@ backfill needed.
 
 #### Automated
 
-- [x] 2.1 Type checking passes
-- [x] 2.2 Linting passes
-- [x] 2.3 Unit tests for `extractRecipeFromPhoto` pass
+- [x] 2.1 Type checking passes — ef71152
+- [x] 2.2 Linting passes — ef71152
+- [x] 2.3 Unit tests for `extractRecipeFromPhoto` pass — ef71152
 
 #### Manual
 
-- [x] 2.4 Service called directly with one real recipe photo returns plausible extraction
+- [x] 2.4 Service called directly with one real recipe photo returns plausible extraction — ef71152
 
 ### Phase 3: API Route — Validation, Rate Limiting & Extraction Orchestration
 

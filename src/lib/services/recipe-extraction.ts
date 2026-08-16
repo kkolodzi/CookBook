@@ -11,6 +11,7 @@ export type ExtractionResult =
 
 const EXTRACTION_TIMEOUT_MS = 10_000;
 const OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
+const SUPPORTED_MIME_TYPES = ["image/jpeg", "image/png"];
 
 const RECIPE_TYPES = [
   "dessert",
@@ -76,7 +77,7 @@ function meetsFloor(name: string | null, ingredients: string[]): name is string 
 }
 
 export async function extractRecipeFromPhoto(imageBytes: ArrayBuffer, mimeType: string): Promise<ExtractionResult> {
-  if (!OPENROUTER_API_KEY) {
+  if (!OPENROUTER_API_KEY || !SUPPORTED_MIME_TYPES.includes(mimeType)) {
     return { success: false, reason: "technical_error", raw: null };
   }
 
@@ -111,7 +112,8 @@ export async function extractRecipeFromPhoto(imageBytes: ArrayBuffer, mimeType: 
     });
 
     if (!response.ok) {
-      return { success: false, reason: "technical_error", raw: null };
+      const body = (await response.text()).slice(0, 2000);
+      return { success: false, reason: "technical_error", raw: { status: response.status, body } };
     }
 
     const body = (await response.json()) as unknown;

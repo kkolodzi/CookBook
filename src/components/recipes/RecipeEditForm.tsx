@@ -82,6 +82,9 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
 
       setIngredients(cleanedIngredients);
       setStatus("success");
+      window.setTimeout(() => {
+        window.location.href = "/recipes";
+      }, 700);
     } catch {
       setErrorMessage(GENERIC_ERROR_MESSAGE);
       setStatus("error");

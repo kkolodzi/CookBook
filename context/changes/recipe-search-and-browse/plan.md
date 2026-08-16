@@ -430,10 +430,10 @@ against the existing F-02 schema.
 
 #### Manual
 
-- [ ] 1.4 `GET /api/recipes` returns the user's recipes, newest first
-- [ ] 1.5 `GET /api/recipes?q=<ingredient>` returns only matching recipes
-- [ ] 1.6 `GET /api/recipes?type=soup` returns only that type
-- [ ] 1.7 Soft-deleted recipes never appear
+- [x] 1.4 `GET /api/recipes` returns the user's recipes, newest first
+- [x] 1.5 `GET /api/recipes?q=<ingredient>` returns only matching recipes
+- [x] 1.6 `GET /api/recipes?type=soup` returns only that type
+- [x] 1.7 Soft-deleted recipes never appear
 
 ### Phase 2: Browse & search UI
 
@@ -444,12 +444,12 @@ against the existing F-02 schema.
 
 #### Manual
 
-- [ ] 2.3 Empty collection shows "no recipes yet" state with working link to `/recipes/new`
-- [ ] 2.4 Non-empty collection lists recipes newest-first with photos
-- [ ] 2.5 Ingredient search narrows results within ~300ms; clearing restores full list
-- [ ] 2.6 Type chip narrows results; chip + search combine
-- [ ] 2.7 Zero-match search shows the "no results" state, not blank
-- [ ] 2.8 Works one-handed on a phone-width viewport
+- [x] 2.3 Empty collection shows "no recipes yet" state with working link to `/recipes/new`
+- [x] 2.4 Non-empty collection lists recipes newest-first with photos
+- [x] 2.5 Ingredient search narrows results within ~300ms; clearing restores full list
+- [x] 2.6 Type chip narrows results; chip + search combine
+- [x] 2.7 Zero-match search shows the "no results" state, not blank
+- [x] 2.8 Works one-handed on a phone-width viewport
 
 ### Phase 3: Recipe detail view
 
@@ -460,7 +460,7 @@ against the existing F-02 schema.
 
 #### Manual
 
-- [ ] 3.3 Card tap opens correct detail page with full ingredient list
-- [ ] 3.4 Another user's/nonexistent recipe id returns 404
-- [ ] 3.5 Soft-deleted recipe id returns 404
-- [ ] 3.6 Back link returns to `/recipes`
+- [x] 3.3 Card tap opens correct detail page with full ingredient list
+- [x] 3.4 Another user's/nonexistent recipe id returns 404
+- [x] 3.5 Soft-deleted recipe id returns 404
+- [x] 3.6 Back link returns to `/recipes`

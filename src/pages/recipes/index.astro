@@ -1,0 +1,36 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import RecipeBrowser from "@/components/recipes/RecipeBrowser";
+import { createClient } from "@/lib/supabase";
+import { listRecipes } from "@/lib/services/recipe-query";
+import type { RecipeSummaryDto } from "@/types";
+
+const { user } = Astro.locals;
+
+let initialRecipes: RecipeSummaryDto[] = [];
+if (user) {
+  const supabase = createClient(Astro.request.headers, Astro.cookies);
+  if (supabase) {
+    initialRecipes = await listRecipes(supabase, user.id, {});
+  }
+}
+---
+
+<Layout title="Twoje przepisy">
+  <div class="bg-cosmic min-h-screen p-4">
+    <div class="mx-auto max-w-4xl">
+      <div class="mb-6 flex items-center justify-between">
+        <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
+          Twoje przepisy
+        </h1>
+        <a
+          href="/recipes/new"
+          class="rounded-lg bg-purple-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-500"
+        >
+          Dodaj przepis
+        </a>
+      </div>
+      <RecipeBrowser client:load initialRecipes={initialRecipes} />
+    </div>
+  </div>
+</Layout>

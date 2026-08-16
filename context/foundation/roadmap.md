@@ -164,6 +164,17 @@ Foundations below assume these are present and do NOT re-scaffold them.
   approach (PDF text extraction vs. vision-model image analysis).
 - **[Feature] Social login (Google/Facebook)** — already captured; see **Parked** below
   ("Social login (OAuth)") — PRD currently specifies email + password only at launch.
+- **[UX] Dashboard is a redundant middle step — make "Twoje przepisy" the post-login landing
+  screen** — surfaced during S-02 manual testing (2026-08-16). Current flow: login → placeholder
+  `/dashboard` (email + two links) → user clicks "Twoje przepisy" → `/recipes`. The dashboard
+  adds a click with no value of its own; the recipe collection (`/recipes`, built in S-02) is
+  what a returning user actually wants to see right after signing in. Candidate fix: either
+  redirect post-login straight to `/recipes` and demote/remove `/dashboard`, or fold
+  `/dashboard`'s remaining content (sign-out, "add recipe" entry point) into `/recipes` as its
+  header/nav so it becomes the true welcome screen. Touches `src/middleware.ts` (redirect
+  target after auth), `src/pages/auth/signin.astro`'s post-login redirect, and possibly removes
+  `src/pages/dashboard.astro` entirely. Needs a `/10x-shape` or `/10x-plan` pass to decide
+  between "redirect only" vs. "merge dashboard into /recipes".
 
 ## Parked
 

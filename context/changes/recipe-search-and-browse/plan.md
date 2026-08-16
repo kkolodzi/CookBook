@@ -439,8 +439,8 @@ against the existing F-02 schema.
 
 #### Automated
 
-- [x] 2.1 `npm run lint` passes
-- [x] 2.2 `npm run build` passes
+- [x] 2.1 `npm run lint` passes — 3bed857
+- [x] 2.2 `npm run build` passes — 3bed857
 
 #### Manual
 
@@ -455,8 +455,8 @@ against the existing F-02 schema.
 
 #### Automated
 
-- [ ] 3.1 `npm run lint` passes
-- [ ] 3.2 `npm run build` passes
+- [x] 3.1 `npm run lint` passes
+- [x] 3.2 `npm run build` passes
 
 #### Manual
 

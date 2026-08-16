@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database, RecipeSummaryDto } from "@/types";
+import type { Database, RecipeDetailDto, RecipeIngredientDto, RecipeSummaryDto } from "@/types";
 
 type RecipeTypeValue = Database["public"]["Enums"]["recipe_type"];
 
@@ -88,4 +88,55 @@ export async function listRecipes(
     createdAt: row.created_at,
     photoUrl: signedByPath.get(row.photo_path) ?? null,
   }));
+}
+
+export async function getRecipeDetail(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  recipeId: string,
+): Promise<RecipeDetailDto | null> {
+  const { data: recipe, error: recipeError } = await supabase
+    .from("recipes")
+    .select("id, name, type, photo_path, created_at")
+    .eq("id", recipeId)
+    .eq("user_id", userId)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (recipeError || !recipe) {
+    return null;
+  }
+
+  const { data: ingredientRows, error: ingredientsError } = await supabase
+    .from("recipe_ingredients")
+    .select("id, name, position")
+    .eq("recipe_id", recipe.id)
+    .order("position", { ascending: true });
+
+  if (ingredientsError) {
+    return null;
+  }
+
+  const ingredients: RecipeIngredientDto[] = (ingredientRows as RecipeIngredientDto[]).map((row) => ({
+    id: row.id,
+    name: row.name,
+    position: row.position,
+  }));
+
+  let photoUrl: string | null = null;
+  const { data: signedData, error: signedError } = await supabase.storage
+    .from(RECIPE_PHOTOS_BUCKET)
+    .createSignedUrl(recipe.photo_path, SIGNED_URL_TTL_SECONDS);
+  if (!signedError) {
+    photoUrl = signedData.signedUrl;
+  }
+
+  return {
+    id: recipe.id,
+    name: recipe.name,
+    type: recipe.type,
+    createdAt: recipe.created_at,
+    photoUrl,
+    ingredients,
+  };
 }

@@ -1,0 +1,71 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { createClient } from "@/lib/supabase";
+import { getRecipeDetail } from "@/lib/services/recipe-query";
+import { RECIPE_TYPE_LABELS } from "@/components/recipes/recipe-type-labels";
+import type { RecipeDetailDto } from "@/types";
+
+async function loadRecipe(): Promise<{ status: number; message: string; recipe: RecipeDetailDto | null }> {
+  const { user } = Astro.locals;
+  if (!user) {
+    return { status: 401, message: "Musisz się zalogować.", recipe: null };
+  }
+
+  const supabase = createClient(Astro.request.headers, Astro.cookies);
+  if (!supabase) {
+    return { status: 503, message: "Usługa jest tymczasowo niedostępna.", recipe: null };
+  }
+
+  const { id } = Astro.params;
+  const recipe = id ? await getRecipeDetail(supabase, user.id, id) : null;
+  if (!recipe) {
+    return { status: 404, message: "Nie znaleziono przepisu.", recipe: null };
+  }
+
+  return { status: 200, message: "", recipe };
+}
+
+const { status, message, recipe } = await loadRecipe();
+Astro.response.status = status;
+---
+
+<Layout title={recipe?.name ?? "Nie znaleziono przepisu"}>
+  <div class="bg-cosmic min-h-screen p-4">
+    <div class="mx-auto max-w-2xl">
+      <a href="/recipes" class="mb-4 inline-block text-sm text-blue-100/70 hover:text-white">← Twoje przepisy</a>
+      {
+        !recipe ? (
+          <div class="rounded-2xl border border-white/10 bg-white/10 p-6 text-center text-white backdrop-blur-xl">
+            <p>{message}</p>
+          </div>
+        ) : (
+          <div class="overflow-hidden rounded-2xl border border-white/10 bg-white/10 backdrop-blur-xl">
+            <div class="flex aspect-video items-center justify-center bg-black/20">
+              {recipe.photoUrl ? (
+                <img src={recipe.photoUrl} alt={recipe.name} class="h-full w-full object-cover" />
+              ) : (
+                <span class="text-sm text-white/40">Brak zdjęcia</span>
+              )}
+            </div>
+            <div class="space-y-4 p-6 text-white">
+              <div>
+                <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
+                  {recipe.name}
+                </h1>
+                <p class="mt-1 text-sm text-blue-100/70">{RECIPE_TYPE_LABELS[recipe.type]}</p>
+              </div>
+              <div>
+                <h2 class="text-sm font-semibold text-blue-100/70">Składniki</h2>
+                <ul class="mt-2 list-inside list-disc space-y-1 text-sm text-blue-100/90">
+                  {recipe.ingredients.map((ingredient) => (
+                    <li>{ingredient.name}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )
+      }
+    </div>
+  </div>
+</Layout>

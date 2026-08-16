@@ -282,3 +282,11 @@ export const Constants = {
     },
   },
 } as const;
+
+export interface RecipeSummaryDto {
+  id: string;
+  name: string;
+  type: Database["public"]["Enums"]["recipe_type"];
+  createdAt: string;
+  photoUrl: string | null;
+}

@@ -32,7 +32,7 @@ Home cooks save recipes on social media but can't find them at meal time — the
 | F-01 | supabase-auth-setup      | (foundation) sign-up and sign-in work; users can be persisted    | —              | FR-001, FR-002                         | done |
 | F-02 | recipe-data-schema       | (foundation) recipe schema with structured ingredients landed    | F-01           | FR-015, FR-008, FR-020                 | done |
 | S-01 | photo-to-recipe-save     | upload a photo, get an AI-extracted recipe saved to collection  | F-01, F-02     | FR-004, FR-005, FR-008, US-01          | done |
-| S-02 | recipe-search-and-browse | search recipes by ingredient, filter by type, view details       | S-01           | FR-013, FR-015, FR-016, FR-018, US-02  | proposed |
+| S-02 | recipe-search-and-browse | search recipes by ingredient, filter by type, view details       | S-01           | FR-013, FR-015, FR-016, FR-018, US-02  | in-progress |
 | S-03 | recipe-edit-and-remove   | edit a saved recipe and remove it reversibly                     | S-01           | FR-019, FR-020                         | proposed |
 
 ## Streams
@@ -111,7 +111,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Low technical risk; the main risk is mobile one-handed usability (PRD secondary success criterion), which needs validation on a real device before this slice is called done. FR-015 and FR-016 are must-have, so under a speed goal this stays squarely on the must-have path rather than becoming a candidate for parking.
-- **Status:** proposed
+- **Status:** in-progress
 
 ### S-03: Recipe edit and reversible removal
 

@@ -64,7 +64,8 @@ export async function listRecipes(
     .limit(LIST_RESULT_CAP);
 
   if (hasQuery) {
-    query = query.ilike("recipe_ingredients.name", `%${trimmedQuery}%`);
+    const escapedQuery = trimmedQuery.replace(/[\\%_]/g, (match) => `\\${match}`);
+    query = query.ilike("recipe_ingredients.name", `%${escapedQuery}%`);
   }
   if (params.type) {
     query = query.eq("type", params.type);

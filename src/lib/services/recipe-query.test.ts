@@ -62,6 +62,14 @@ describe("listRecipes", () => {
     expect(client.builder.ilike).toHaveBeenCalledWith("recipe_ingredients.name", "%marchewka%");
   });
 
+  it("escapes ilike wildcard characters in the search query", async () => {
+    const client = makeSupabaseClient({ queryResult: { data: [], error: null } });
+
+    await listRecipes(client as never, "user-1", { q: "50%_off" });
+
+    expect(client.builder.ilike).toHaveBeenCalledWith("recipe_ingredients.name", "%50\\%\\_off%");
+  });
+
   it("filters by type", async () => {
     const client = makeSupabaseClient({ queryResult: { data: [], error: null } });
 

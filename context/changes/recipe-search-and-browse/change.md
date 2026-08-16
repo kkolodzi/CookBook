@@ -1,7 +1,7 @@
 ---
 change_id: recipe-search-and-browse
 title: Recipe search, type filter, and detail view
-status: implemented
+status: impl_reviewed
 created: 2026-08-16
 updated: 2026-08-16
 archived_at: null

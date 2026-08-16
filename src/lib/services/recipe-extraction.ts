@@ -100,6 +100,7 @@ export async function extractRecipeFromPhoto(imageBytes: ArrayBuffer, mimeType: 
         model: OPENROUTER_MODEL,
         response_format: { type: "json_object" },
         max_tokens: 2000,
+        reasoning: { effort: "none" },
         messages: [
           {
             role: "user",

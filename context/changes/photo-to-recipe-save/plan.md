@@ -620,26 +620,26 @@ backfill needed.
 
 #### Automated
 
-- [x] 3.1 Type checking passes
-- [x] 3.2 Linting passes
-- [x] 3.3 Integration test: 401/400/429 paths and successful extraction pass-through
+- [x] 3.1 Type checking passes — e72aa46
+- [x] 3.2 Linting passes — e72aa46
+- [x] 3.3 Integration test: 401/400/429 paths and successful extraction pass-through — e72aa46
 
 #### Manual
 
-- [x] 3.4 REST client confirms 401/400/429 paths return expected Polish messages
+- [x] 3.4 REST client confirms 401/400/429 paths return expected Polish messages — e72aa46
 
 ### Phase 4: API Route — Persistence
 
 #### Automated
 
-- [ ] 4.1 Type checking passes
-- [ ] 4.2 Linting passes
-- [ ] 4.3 Integration test: successful save produces consistent recipe/ingredients/storage/attempt rows
-- [ ] 4.4 Integration test: ingredients-insert failure triggers compensating recipe delete
+- [x] 4.1 Type checking passes
+- [x] 4.2 Linting passes
+- [x] 4.3 Integration test: successful save produces consistent recipe/ingredients/storage/attempt rows
+- [x] 4.4 Integration test: ingredients-insert failure triggers compensating recipe delete
 
 #### Manual
 
-- [ ] 4.5 Real photo submission via dev server verified end-to-end in Supabase dashboard
+- [x] 4.5 Real photo submission via dev server verified end-to-end in Supabase dashboard
 
 ### Phase 5: Upload UI — Happy Path
 

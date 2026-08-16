@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase";
 import { extractRecipeFromPhoto, SUPPORTED_MIME_TYPES } from "@/lib/services/recipe-extraction";
+import type { Json } from "@/types";
 
 export const prerender = false;
 
@@ -19,6 +20,10 @@ const photoSchema = z
 
 function jsonResponse(body: unknown, status: number): Response {
   return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
+}
+
+function extensionFromMimeType(mimeType: string): string {
+  return mimeType === "image/png" ? "png" : "jpg";
 }
 
 export const POST: APIRoute = async (context) => {
@@ -62,5 +67,61 @@ export const POST: APIRoute = async (context) => {
   const bytes = await photo.arrayBuffer();
   const result = await extractRecipeFromPhoto(bytes, photo.type);
 
-  return jsonResponse(result, 200);
+  if (!result.success) {
+    await supabase.from("extraction_attempts").insert({
+      user_id: user.id,
+      success: false,
+      failure_reason: result.reason,
+      raw_response: result.raw as Json,
+    });
+    return jsonResponse({ success: false, reason: result.reason }, 200);
+  }
+
+  const storagePath = `${user.id}/${crypto.randomUUID()}.${extensionFromMimeType(photo.type)}`;
+  const { error: uploadError } = await supabase.storage
+    .from("recipe-photos")
+    .upload(storagePath, bytes, { contentType: photo.type });
+
+  if (uploadError) {
+    return jsonResponse({ error: "Wystąpił błąd podczas zapisu zdjęcia. Spróbuj ponownie." }, 500);
+  }
+
+  const { data: recipeRow, error: recipeError } = await supabase
+    .from("recipes")
+    .insert({ user_id: user.id, name: result.name, type: result.type ?? "other", photo_path: storagePath })
+    .select("id, name, type")
+    .single();
+
+  if (recipeError) {
+    return jsonResponse({ error: "Wystąpił błąd podczas zapisu przepisu. Spróbuj ponownie." }, 500);
+  }
+
+  const ingredientRows = result.ingredients.map((name, position) => ({
+    recipe_id: recipeRow.id,
+    name,
+    position,
+  }));
+
+  const { error: ingredientsError } = await supabase.from("recipe_ingredients").insert(ingredientRows);
+
+  if (ingredientsError) {
+    await supabase.from("recipes").delete().eq("id", recipeRow.id);
+    return jsonResponse({ error: "Wystąpił błąd podczas zapisu składników. Spróbuj ponownie." }, 500);
+  }
+
+  await supabase.from("extraction_attempts").insert({
+    user_id: user.id,
+    success: true,
+    raw_response: result.raw as Json,
+    recipe_id: recipeRow.id,
+  });
+
+  return jsonResponse(
+    {
+      success: true,
+      recipe: { id: recipeRow.id, name: recipeRow.name, type: recipeRow.type, ingredients: result.ingredients },
+      typeUnconfirmed: result.type === null,
+    },
+    200,
+  );
 };

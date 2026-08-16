@@ -424,9 +424,9 @@ against the existing F-02 schema.
 
 #### Automated
 
-- [x] 1.1 `npm run lint` passes
-- [x] 1.2 `npm run build` passes
-- [x] 1.3 `npm run test -- recipes.test` passes
+- [x] 1.1 `npm run lint` passes — ff07c5c
+- [x] 1.2 `npm run build` passes — ff07c5c
+- [x] 1.3 `npm run test -- recipes.test` passes — ff07c5c
 
 #### Manual
 
@@ -439,8 +439,8 @@ against the existing F-02 schema.
 
 #### Automated
 
-- [ ] 2.1 `npm run lint` passes
-- [ ] 2.2 `npm run build` passes
+- [x] 2.1 `npm run lint` passes
+- [x] 2.2 `npm run build` passes
 
 #### Manual
 

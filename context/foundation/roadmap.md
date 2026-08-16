@@ -34,6 +34,7 @@ Home cooks save recipes on social media but can't find them at meal time — the
 | S-01 | photo-to-recipe-save     | upload a photo, get an AI-extracted recipe saved to collection  | F-01, F-02     | FR-004, FR-005, FR-008, US-01          | done |
 | S-02 | recipe-search-and-browse | search recipes by ingredient, filter by type, view details       | S-01           | FR-013, FR-015, FR-016, FR-018, US-02  | done |
 | S-03 | recipe-edit-and-remove   | edit a saved recipe and remove it reversibly                     | S-01           | FR-019, FR-020                         | done |
+| S-04 | recipe-prep-instructions | see a recipe's preparation instructions, extracted from the photo | S-01           | FR-021, FR-018, FR-019                 | planning |
 
 ## Streams
 
@@ -43,6 +44,7 @@ Navigation aid — groups items that share a Prerequisites chain. Canonical orde
 | ------ | ------------------- | ----------------------------------- | -------------------------------------------------------------- |
 | A      | Core pipeline        | `F-01` → `F-02` → `S-01` → `S-02` | Main sequential path; `S-02` completes the validation loop.     |
 | B      | Recipe management     | `S-03`                             | Parallel with `S-02` after `S-01`; joins Stream A at `S-01`.   |
+| C      | Recipe completeness   | `S-04`                             | Depends only on `S-01`, but touches the same detail-view (FR-018) and edit-form (FR-019) surfaces as `S-02`/`S-03` — plan now, implement after S-02/S-03 merge to avoid colliding on those files. |
 
 ## Baseline
 
@@ -95,10 +97,8 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Prerequisites:** F-01 (Supabase configured), F-02 (recipe schema)
 - **Parallel with:** —
 - **Blockers:** —
-- **Unknowns:**
-  - Which vision API provider to use (and at what cost per extraction call)? — Owner: builder. Block: yes — FR-005 cannot be implemented until a provider is chosen and the integration is scoped.
-  - Will the chosen vision API reliably extract ingredients from Polish handwritten or printed recipes? — Owner: builder (validate during implementation with sample photos). Block: no — a quality risk to tune, not a planning blocker.
-- **Risk:** This is both the north star and the riskiest slice — AI extraction quality on Polish recipes is unverified until tested. Under a speed goal, this sits on the strict must-have path — the smallest set of features already marked must-have in the PRD, skipping every nice-to-have — and every other slice depends on it existing, so it cannot be allowed to slip.
+- **Unknowns:** — none open. Provider chosen (OpenRouter, see Open Roadmap Question 1); Polish extraction quality validated during manual testing 2026-08-16 (see Candidate Ideas below for gaps found, not blockers).
+- **Risk:** Resolved — implemented and archived. Extraction works well enough to ship, but manual testing surfaced two scope gaps now tracked as Candidate Ideas (no prep instructions; quantities not independently addressable).
 - **Status:** done
 
 ### S-02: Recipe search, type filter, and detail view
@@ -121,42 +121,51 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Prerequisites:** S-01 (needs saved recipes to edit or remove)
 - **Parallel with:** S-02 (browse/search is independent of edit/remove once S-01 is done)
 - **Blockers:** —
-- **Unknowns:**
-  - Recovery window for removed recipes: how long (hours, days)? — Owner: builder. Block: no — PRD Open Question 1; any reasonable default ships and is tunable later if F-02 uses a timestamp column.
+- **Unknowns:** — recovery window resolved (30 days; see Open Roadmap Question 2). Still open: whether recovery is a dedicated "Trash" view or an undo notification after delete — that's a UX/scope call for planning, not a blocker.
 - **Risk:** Reversible removal needs some recovery affordance (a "Trash" view, or an undo notification) — that UX choice affects scope. Implementation risk is otherwise low.
 - **Status:** done
+
+### S-04: Recipe preparation instructions
+
+- **Outcome:** user's saved recipe includes preparation instructions extracted from the photo as freeform text; visible in the recipe detail view and editable, same as name/ingredients/type/note today.
+- **Change ID:** recipe-prep-instructions
+- **PRD refs:** FR-021 (extract + save instructions, must-have, best-effort/non-blocking), FR-018 (detail view now includes instructions), FR-019 (edit now includes instructions)
+- **Prerequisites:** S-01 (extraction pipeline + schema pattern to extend)
+- **Parallel with:** S-02 (merged 2026-08-16), S-03 (resolving conflicts) — the backend slice (FR-021) is implementable now regardless. FR-018/FR-019 (detail view, edit form) still need to wait for S-03 to merge, since it edits the same `src/pages/recipes/[id].astro` that S-02 already changed.
+- **Blockers:** none for the planned backend slice. Implementation of FR-018/FR-019 (detail view, edit form) is blocked on S-03 merging to `main` (file-overlap risk, not a dependency in the FR sense).
+- **Unknowns:**
+  - Can the vision API reliably transcribe multi-line Polish preparation instructions from handwritten/printed recipes, at the same quality bar validated for ingredients during S-01? — Owner: builder, validate during implementation. Block: no — extraction is best-effort/nullable by design (see FR-021), so a quality shortfall degrades gracefully rather than blocking.
+- **Risk:** Low technical risk (additive `instructions text` column, same extraction-service pattern as name/type/ingredients). Main risk is sequencing discipline — implementing before S-02/S-03 merge would create avoidable merge conflicts on the detail-view and edit-form components.
+- **Status:** planning — `plan.md` written 2026-08-16, scoped to the backend slice only (migration, extraction, API, upload-confirmation UI); safe to `/10x-implement` now. A follow-up plan for FR-018/FR-019 will be written after S-02 + S-03 merge. See `context/changes/recipe-prep-instructions/plan-brief.md`.
 
 ## Backlog Handoff
 
 | Roadmap ID | Change ID                | Suggested issue title                           | Ready for `/10x-plan` | Notes                                      |
 | ---------- | ------------------------- | ------------------------------------------------ | ---------------------- | -------------------------------------------- |
-| F-01       | supabase-auth-setup      | Configure Supabase project + enable auth          | yes                    | Run `/10x-plan supabase-auth-setup`          |
-| F-02       | recipe-data-schema       | Design and migrate recipe data schema             | no                     | Awaits F-01 completion                       |
-| S-01       | photo-to-recipe-save     | Photo upload → AI extraction → recipe save        | no                     | Blocked: vision API provider not chosen      |
-| S-02       | recipe-search-and-browse | Recipe ingredient search + type filter + detail   | no                     | Awaits S-01                                  |
-| S-03       | recipe-edit-and-remove   | Edit recipe + reversible removal                  | no                     | Awaits S-01; parallel with S-02              |
+| F-01       | supabase-auth-setup      | Configure Supabase project + enable auth          | done                   | Archived 2026-08-15                          |
+| F-02       | recipe-data-schema       | Design and migrate recipe data schema             | done                   | Archived 2026-08-15                          |
+| S-01       | photo-to-recipe-save     | Photo upload → AI extraction → recipe save        | done                   | Archived 2026-08-16                          |
+| S-02       | recipe-search-and-browse | Recipe ingredient search + type filter + detail   | done                   | Merged to `main` 2026-08-16; archived to `context/archive/2026-08-16-recipe-search-and-browse/` |
+| S-03       | recipe-edit-and-remove   | Edit recipe + reversible removal                  | yes                    | S-01 done; recovery window resolved (30 days, Open Roadmap Question 2); implementation + impl-review complete in worktree `cookbook_recipe-edit-and-remove` (branch `feature/recipe-edit-and-remove`); resolving merge conflicts against `main` (introduced by S-02 landing first — both branches touched `src/pages/recipes/[id].astro`) as of 2026-08-16 |
+| S-04       | recipe-prep-instructions | Capture and show recipe preparation instructions  | planned                | Backend slice planned 2026-08-16 (`/10x-implement recipe-prep-instructions phase 1` is safe now — S-02 already merged, doesn't block it anyway). FR-018/FR-019 UI slice needs its own follow-up plan once S-03 also merges |
 
 ## Open Roadmap Questions
 
-1. **Which vision API provider to use for photo extraction?** — Owner: builder. Block: S-01 (planning and implementation cannot proceed until the provider is chosen; the choice affects integration approach, error handling, cost model, and response format). Resolving this promotes S-01 from `blocked` to `proposed` and makes `/10x-plan photo-to-recipe-save` runnable once F-01 and F-02 are done.
-2. **How long should a removed recipe remain recoverable (FR-020)?** — Owner: builder. Block: no — any reasonable default (e.g. 30 days) ships; the value is tunable without a schema migration if F-02 uses a timestamp column. Decision needed before F-02 is finalised.
+1. ~~**Which vision API provider to use for photo extraction?**~~ — **Resolved during S-01 planning (2026-08-15): OpenRouter**, a model-agnostic gateway, rather than a direct single-provider SDK — the underlying vision model can be swapped without rewriting the integration. See `context/archive/2026-08-15-photo-to-recipe-save/change.md`.
+2. ~~**How long should a removed recipe remain recoverable (FR-020)?**~~ — **Resolved (2026-08-16): 30 days.** Matches the common trash/recycle-bin convention (Gmail, Drive, Dropbox) and needs no schema change — `recipes.deleted_at` (migration `20260815132912_recipe_schema.sql`) is already a `timestamptz`, so the window is a pure business-logic constant enforced by a query filter (`deleted_at > now() - interval '30 days'`) or a scheduled hard-delete job, not a column. S-03 (`recipe-edit-and-remove`) should treat this as the default recovery window unless the builder overrides it during planning.
 
 ## Candidate Ideas (unplanned)
 
 > Surfaced during S-01 manual testing (2026-08-16). Not yet triaged into Slices — not scoped,
 > not estimated. Candidates for a future `/10x-shape` or `/10x-plan` pass.
 
-- **[Bug] Recipe has no preparation instructions/steps** — the extraction pipeline (S-01) and
-  schema (F-02) only capture name, ingredient list, and type — never the "how to make it" text.
-  Surfaced during manual testing: a saved recipe has no cooking instructions because none are
-  extracted or stored. This isn't in the current PRD at all, and is arguably a core-value gap —
-  a "recipe" without steps has limited real usefulness. Needs a `/10x-shape` pass to decide
-  scope (structured step list vs. freeform text) before any schema/extraction change.
-- **[Bug] Ingredient quantities merged into the ingredient text, not a separate field** —
-  `recipe_ingredients.name` currently stores the full line (e.g. "2 szklanki mąki") as one text
-  blob; quantity/unit isn't independently addressable. Affects F-02's schema, S-01's extraction
-  prompt, and any future ingredient-scaling feature. Needs a schema migration (new
-  `quantity`/`unit` columns) plus an extraction-prompt change.
+- **[Requirement gap] Recipe has no preparation instructions/steps** — framed via `/10x-frame`
+  (2026-08-16, HIGH confidence): not an S-01 bug — FR-005 never specified capturing steps, so
+  nothing downstream could have captured them. No FR, no Socrates note, no schema-plan mention
+  anywhere considers and rejects this; it was simply never raised. Real core-value gap (a
+  "recipe" without steps has limited usefulness). Reclassified from "[Bug]" — see
+  `context/changes/recipe-prep-instructions/frame.md`. Next: `/10x-shape` to decide scope
+  (structured step list vs. freeform text) and priority as a PRD amendment.
 - **[Feature] Dashboard — favorite recipes** — let users mark/star recipes as favorites and
   surface them on the dashboard. Depends on S-02 existing (a collection view to favorite from).
 - **[Feature] PDF recipe upload** — extend FR-004 (currently photo-only: JPEG/PNG) to also
@@ -229,6 +238,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Offline-first** — Why parked: PRD §Non-Goals; AI extraction requires a live network connection.
 - **Social login (OAuth)** — Why parked: PRD says email + password only at launch.
 - **Observability infrastructure** — Why parked: no launch-blocking NFR names it, and under a speed goal it isn't on the must-have path; `wrangler tail` covers live debugging for now. Revisit before the first real production incident.
+- **Ingredient quantities as a separate field** (`quantity`/`unit` columns on `recipe_ingredients`) — Why parked: framed via `/10x-frame` (2026-08-16, HIGH confidence) as a deliberate S-01 design choice, not a bug — the extraction prompt explicitly says "keep quantities if present" to match F-02's single-column schema, and FR-015's independent-addressability requirement is satisfied at the ingredient-row level already. No current FR needs quantity as structured data. Revisit if FR-011 (per-ingredient annotations) or an ingredient-scaling feature is ever picked up. See `context/changes/recipe-ingredient-quantities/frame.md`.
 
 ## Done
 

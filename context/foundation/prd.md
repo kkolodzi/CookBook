@@ -3,6 +3,7 @@ project: "SnapRecipe"
 version: 1
 status: draft
 created: 2026-06-13
+updated: 2026-08-16
 context_type: greenfield
 product_type: web-app
 target_scale:
@@ -115,6 +116,9 @@ The builder — operator and maintainer of the product for v1, and a secondary u
 - FR-012: User can create a custom recipe type tag beyond the predefined list. Priority: nice-to-have
   > Socrates: Counter-argument considered: "fixed list + 'Other' covers 95% of cases." Resolution: kept as nice-to-have — the fixed list covers MVP; custom tags are a v2 enrichment.
 
+- FR-021: After a photo is uploaded, the app extracts the recipe's preparation instructions as freeform text and saves them alongside the recipe. Priority: must-have. Extraction is best-effort and non-blocking — same pattern as FR-008 (type): a failed or partial extraction does not prevent the save from succeeding.
+  > Socrates: Counter-argument accepted in part: "the photo itself is already preserved as a fallback (see guardrail: photo preserved alongside structured data), so extracted instructions are a convenience layer, not the only path to the steps." Resolution: kept must-have (matches the bar of the other core recipe fields), but the counter-argument is why extraction is best-effort/nullable rather than blocking the save — same treatment as FR-008's type assignment. Added 2026-08-16 via `/10x-frame` + lightweight shaping (`context/changes/recipe-prep-instructions/`); not in the original v1 shaping — surfaced during S-01 manual testing as a core-value gap (a saved recipe couldn't be cooked from without opening the photo).
+
 ### Recipe Discovery
 
 - FR-013: The recipe collection screen shows all saved recipes when no search query is entered. Priority: must-have
@@ -132,12 +136,12 @@ The builder — operator and maintainer of the product for v1, and a secondary u
 - FR-017: User can sort the recipe collection by date added. Priority: nice-to-have
   > Socrates: Counter-argument considered: "default to newest-first, no sort toggle needed." Resolution: kept as nice-to-have — the default order is newest first; the sort toggle is a v1 polish item.
 
-- FR-018: User can view a recipe's full details (name, ingredient list, type, note, photo). Priority: must-have
+- FR-018: User can view a recipe's full details (name, ingredient list, type, note, photo, preparation instructions). Priority: must-have
   > Socrates: Counter-argument considered: "simplify to name + ingredients only." Resolution: rejected — the detail view is what the user reads while cooking; all captured fields must be visible.
 
 ### Recipe Management
 
-- FR-019: User can edit a saved recipe (name, ingredients, type, note). Priority: must-have
+- FR-019: User can edit a saved recipe (name, ingredients, type, note, preparation instructions). Priority: must-have
   > Socrates: Counter-argument considered: "delete and re-add is enough." Resolution: rejected — the user must be able to correct extraction results without losing the recipe and starting over.
 
 - FR-020: User can remove a recipe from their collection; removal is reversible and the recipe remains recoverable. Priority: must-have
@@ -175,4 +179,4 @@ Multi-user web app. Each authenticated user has access to their own saved recipe
 
 ## Open Questions
 
-1. **Recovery window for removed recipes (FR-020)**: for how long should a removed recipe remain recoverable? No window was specified during shaping. Owner: builder. Block: no — MVP can launch with any reasonable window; the decision can be deferred to implementation.
+1. ~~**Recovery window for removed recipes (FR-020)**~~ — **Resolved (2026-08-16): 30 days**, matching the common trash/recycle-bin convention. No schema impact — `recipes.deleted_at` is a `timestamptz`, so the window is enforced in application logic, not a migration. See `context/foundation/roadmap.md` Open Roadmap Question 2.

@@ -3,7 +3,7 @@ project: SnapRecipe
 version: 1
 status: draft
 created: 2026-08-15
-updated: 2026-08-15
+updated: 2026-08-16
 prd_version: 1
 main_goal: speed
 top_blocker: external
@@ -140,6 +140,30 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 1. **Which vision API provider to use for photo extraction?** — Owner: builder. Block: S-01 (planning and implementation cannot proceed until the provider is chosen; the choice affects integration approach, error handling, cost model, and response format). Resolving this promotes S-01 from `blocked` to `proposed` and makes `/10x-plan photo-to-recipe-save` runnable once F-01 and F-02 are done.
 2. **How long should a removed recipe remain recoverable (FR-020)?** — Owner: builder. Block: no — any reasonable default (e.g. 30 days) ships; the value is tunable without a schema migration if F-02 uses a timestamp column. Decision needed before F-02 is finalised.
+
+## Candidate Ideas (unplanned)
+
+> Surfaced during S-01 manual testing (2026-08-16). Not yet triaged into Slices — not scoped,
+> not estimated. Candidates for a future `/10x-shape` or `/10x-plan` pass.
+
+- **[Bug] Recipe has no preparation instructions/steps** — the extraction pipeline (S-01) and
+  schema (F-02) only capture name, ingredient list, and type — never the "how to make it" text.
+  Surfaced during manual testing: a saved recipe has no cooking instructions because none are
+  extracted or stored. This isn't in the current PRD at all, and is arguably a core-value gap —
+  a "recipe" without steps has limited real usefulness. Needs a `/10x-shape` pass to decide
+  scope (structured step list vs. freeform text) before any schema/extraction change.
+- **[Bug] Ingredient quantities merged into the ingredient text, not a separate field** —
+  `recipe_ingredients.name` currently stores the full line (e.g. "2 szklanki mąki") as one text
+  blob; quantity/unit isn't independently addressable. Affects F-02's schema, S-01's extraction
+  prompt, and any future ingredient-scaling feature. Needs a schema migration (new
+  `quantity`/`unit` columns) plus an extraction-prompt change.
+- **[Feature] Dashboard — favorite recipes** — let users mark/star recipes as favorites and
+  surface them on the dashboard. Depends on S-02 existing (a collection view to favorite from).
+- **[Feature] PDF recipe upload** — extend FR-004 (currently photo-only: JPEG/PNG) to also
+  accept PDF recipe files. Affects the upload UI, file validation, and possibly the extraction
+  approach (PDF text extraction vs. vision-model image analysis).
+- **[Feature] Social login (Google/Facebook)** — already captured; see **Parked** below
+  ("Social login (OAuth)") — PRD currently specifies email + password only at launch.
 
 ## Parked
 

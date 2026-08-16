@@ -44,7 +44,7 @@ Navigation aid — groups items that share a Prerequisites chain. Canonical orde
 | ------ | ------------------- | ----------------------------------- | -------------------------------------------------------------- |
 | A      | Core pipeline        | `F-01` → `F-02` → `S-01` → `S-02` | Main sequential path; `S-02` completes the validation loop.     |
 | B      | Recipe management     | `S-03`                             | Parallel with `S-02` after `S-01`; joins Stream A at `S-01`.   |
-| C      | Recipe completeness   | `S-04`                             | Depends only on `S-01`, but touches the same detail-view (FR-018) and edit-form (FR-019) surfaces as `S-02`/`S-03` — plan now, implement after S-02/S-03 merge to avoid colliding on those files. |
+| C      | Recipe completeness   | `S-04`                             | Depends on S-01, S-02, and S-03 all being merged (touches the detail-view and edit-form surfaces those two built). All three are merged as of 2026-08-16 — no longer blocked. |
 
 ## Baseline
 
@@ -131,12 +131,12 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Change ID:** recipe-prep-instructions
 - **PRD refs:** FR-021 (extract + save instructions, must-have, best-effort/non-blocking), FR-018 (detail view now includes instructions), FR-019 (edit now includes instructions)
 - **Prerequisites:** S-01 (extraction pipeline + schema pattern to extend)
-- **Parallel with:** S-02 (merged 2026-08-16), S-03 (resolving conflicts) — the backend slice (FR-021) is implementable now regardless. FR-018/FR-019 (detail view, edit form) still need to wait for S-03 to merge, since it edits the same `src/pages/recipes/[id].astro` that S-02 already changed.
-- **Blockers:** none for the planned backend slice. Implementation of FR-018/FR-019 (detail view, edit form) is blocked on S-03 merging to `main` (file-overlap risk, not a dependency in the FR sense).
+- **Parallel with:** S-02 and S-03 (both merged to `main` 2026-08-16) — no longer a sequencing concern; this plan now builds on their real, merged detail-view/edit-form code instead of worktree guesses.
+- **Blockers:** none. All prerequisites (S-01, S-02, S-03) are merged.
 - **Unknowns:**
   - Can the vision API reliably transcribe multi-line Polish preparation instructions from handwritten/printed recipes, at the same quality bar validated for ingredients during S-01? — Owner: builder, validate during implementation. Block: no — extraction is best-effort/nullable by design (see FR-021), so a quality shortfall degrades gracefully rather than blocking.
-- **Risk:** Low technical risk (additive `instructions text` column, same extraction-service pattern as name/type/ingredients). Main risk is sequencing discipline — implementing before S-02/S-03 merge would create avoidable merge conflicts on the detail-view and edit-form components.
-- **Status:** planning — `plan.md` written 2026-08-16, scoped to the backend slice only (migration, extraction, API, upload-confirmation UI); safe to `/10x-implement` now. A follow-up plan for FR-018/FR-019 will be written after S-02 + S-03 merge. See `context/changes/recipe-prep-instructions/plan-brief.md`.
+- **Risk:** Low technical risk — additive `instructions text` column, one extra `edit_recipe()` RPC parameter (kept additive via `default null`), matching UI patterns in three existing components. No remaining sequencing risk.
+- **Status:** planning — `plan.md` written 2026-08-16 and extended same day once S-02/S-03 merged to cover the full slice (7 phases: backend, upload UI, detail view, edit form, production rollout). Safe to `/10x-implement` now, start to finish. See `context/changes/recipe-prep-instructions/plan-brief.md`.
 
 ## Backlog Handoff
 
@@ -147,7 +147,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 | S-01       | photo-to-recipe-save     | Photo upload → AI extraction → recipe save        | done                   | Archived 2026-08-16                          |
 | S-02       | recipe-search-and-browse | Recipe ingredient search + type filter + detail   | done                   | Merged to `main` 2026-08-16; archived to `context/archive/2026-08-16-recipe-search-and-browse/` |
 | S-03       | recipe-edit-and-remove   | Edit recipe + reversible removal                  | yes                    | S-01 done; recovery window resolved (30 days, Open Roadmap Question 2); implementation + impl-review complete in worktree `cookbook_recipe-edit-and-remove` (branch `feature/recipe-edit-and-remove`); resolving merge conflicts against `main` (introduced by S-02 landing first — both branches touched `src/pages/recipes/[id].astro`) as of 2026-08-16 |
-| S-04       | recipe-prep-instructions | Capture and show recipe preparation instructions  | planned                | Backend slice planned 2026-08-16 (`/10x-implement recipe-prep-instructions phase 1` is safe now — S-02 already merged, doesn't block it anyway). FR-018/FR-019 UI slice needs its own follow-up plan once S-03 also merges |
+| S-04       | recipe-prep-instructions | Capture and show recipe preparation instructions  | planned                | Full 7-phase plan (backend + detail view + edit form + prod rollout) ready 2026-08-16, after S-02 + S-03 merged same day. `/10x-implement recipe-prep-instructions phase 1` is safe to start. |
 
 ## Open Roadmap Questions
 

@@ -25,9 +25,14 @@ not a from-scratch reshape; see conversation record). Decisions:
   touches no code), but hold `/10x-implement` until both S-02 and S-03 have merged, to avoid
   colliding on the detail-view and edit-form files.
 
-**Planned 2026-08-16** — `plan.md` + `plan-brief.md` written. Scoped to the backend slice only
-(migration, extraction, API, upload-confirmation UI) — FR-018/FR-019 (detail view, edit form)
-deferred to a follow-up plan after S-02/S-03 merge (see plan's "What We're NOT Doing").
+**Planned 2026-08-16** — `plan.md` + `plan-brief.md` written. Initially scoped to the backend
+slice only (migration, extraction, API, upload-confirmation UI) — FR-018/FR-019 (detail view,
+edit form) deferred to a follow-up plan after S-02/S-03 merge.
 
-Next step: `/10x-implement recipe-prep-instructions phase 1` — safe to run now, this plan does
-not touch any S-02/S-03 file.
+**Extended 2026-08-16** — S-02 and S-03 both merged to `main` same day. Re-planned to cover the
+full S-04 slice in one pass: added Phase 5 (detail view, FR-018), Phase 6 (edit form, FR-019,
+extends S-03's `edit_recipe()` RPC), and Phase 7 (production rollout for both migrations).
+Migration filename bumped to `20260816180000_add_recipe_instructions.sql` to avoid a timestamp
+collision with S-03's own `20260816170000_atomic_recipe_ingredient_edit.sql`.
+
+Next step: `/10x-implement recipe-prep-instructions phase 1`.

@@ -1,15 +1,16 @@
-# Recipe Preparation Instructions (backend slice) — Implementation Plan
+# Recipe Preparation Instructions — Implementation Plan
 
 ## Overview
 
 Add a freeform `instructions` field to recipes: extracted from the photo alongside
 name/type/ingredients (best-effort, non-blocking, normalized into flowing-paragraph prose),
-persisted to the database, and surfaced in the existing post-upload confirmation UI. This plan
-covers the **backend slice only** (FR-021) — displaying/editing instructions in the recipe
-detail view and edit form (FR-018, FR-019) is a separate follow-up plan, written after S-02
-(`recipe-search-and-browse`) and S-03 (`recipe-edit-and-remove`) merge, because both branches
-modify `src/pages/recipes/[id].astro` in incompatible ways and the real post-merge file doesn't
-exist yet.
+persisted to the database, surfaced in the post-upload confirmation UI (FR-021), shown in the
+recipe detail view (FR-018), and editable in the edit form (FR-019). Originally scoped as a
+backend-only plan (S-02/S-03 hadn't merged yet, and both touched the detail/edit surfaces this
+plan needs); both have since merged to `main` with real `[id].astro` (detail), `[id]/edit.astro`
++ `RecipeEditForm` (edit), and an atomic `edit_recipe()` Postgres RPC backing the edit flow — so
+this plan now covers the full S-04 slice in one pass (Phases 1-4: backend, unchanged from the
+original scope; Phases 5-7: detail view, edit form, and production rollout, newly added).
 
 ## Current State Analysis
 
@@ -24,22 +25,42 @@ exist yet.
   above `POST`, shifting what were lines 94-141 pre-merge down by ~31 lines.)
 - `src/types.ts` is Supabase-generated (committed static file), currently matches the 8-column
   schema exactly.
-- `src/components/recipes/PhotoUploadForm.tsx:113-141` is the only place in the codebase that
-  renders recipe fields today — an inline post-upload success card showing name/type/ingredients.
-  It's on `main`, untouched by S-02/S-03.
-- No recipe detail or edit view exists on `main`. S-02 and S-03 each independently created
-  `src/pages/recipes/[id].astro` for different purposes (read-only detail vs. edit form) — a real
-  merge conflict between those two branches, unrelated to this plan.
+- `src/components/recipes/PhotoUploadForm.tsx:113-141` renders an inline post-upload success card
+  showing name/type/ingredients. Untouched by S-02/S-03.
+- **Detail view** (`src/pages/recipes/[id].astro`, FR-018, from S-02): loads via
+  `getRecipeDetail()` (`src/lib/services/recipe-query.ts:94-143`) into a `RecipeDetailDto`
+  (`src/types.ts:309-316`); renders name/type/photo/ingredients in a card (lines 51-77), with an
+  "Edytuj" link to `/recipes/${id}/edit` and a `RecipeRemoveButton` (lines 59-67, added by S-03's
+  merge-conflict reconciliation).
+- **Edit page** (`src/pages/recipes/[id]/edit.astro` + `RecipeEditForm.tsx`, FR-019, from S-03):
+  the `.astro` page does its own inline Supabase query (`select("id, name, type")` +
+  `recipe_ingredients`, lines 16-28) rather than reusing `getRecipeDetail`, then renders
+  `RecipeEditForm` (`client:load`) with `{ id, name, type, ingredients }`. The form
+  (`RecipeEditForm.tsx`) is a controlled form with local state for name/type/ingredients;
+  `handleSubmit` (lines 41-79) `PATCH`es `/api/recipes/${recipe.id}` with
+  `{ name, type, ingredients }`.
+- **PATCH route** (`src/pages/api/recipes/[id]/index.ts`): `patchSchema` (lines 8-12) validates
+  `{ name, type, ingredients }`; the handler calls the atomic `edit_recipe` Postgres RPC (lines
+  84-89) rather than doing separate insert/delete calls — S-03 replaced the naive two-step
+  ingredient replace with a single transactional function
+  (`supabase/migrations/20260816170000_atomic_recipe_ingredient_edit.sql`) to avoid a
+  duplicated/zero-ingredient state on partial failure. The RPC signature is
+  `edit_recipe(p_recipe_id uuid, p_name text, p_type recipe_type, p_ingredients text[])`. The
+  same file's `GET` handler (lines 18-59) returns `{ id, name, type, ingredients }` but has no
+  client caller today (`edit.astro` queries Supabase directly instead) — kept in sync anyway for
+  API-shape consistency with `PATCH`.
 
 ## Desired End State
 
 A photo upload extracts and saves preparation instructions (freeform text, nullable) alongside
-name/type/ingredients. The post-upload confirmation shows the extracted instructions in full.
-`src/types.ts` reflects the new column. Existing recipes (saved before this change) have
-`instructions = null` and continue to work unchanged.
+name/type/ingredients. The post-upload confirmation, the recipe detail view, and the edit form
+all show/allow editing instructions, consistently. `src/types.ts` reflects the new column.
+Existing recipes (saved before this change) have `instructions = null` and continue to work
+unchanged everywhere.
 
-Verify by: uploading a recipe photo with visible preparation steps and confirming the
-instructions text appears in the post-upload confirmation card, worded as continuous prose.
+Verify by: uploading a recipe photo with visible preparation steps, confirming the instructions
+text appears in the post-upload confirmation card and in the recipe's detail view, then editing
+the recipe to change the instructions and confirming the edit persists and displays correctly.
 
 ### Key Discoveries:
 
@@ -53,26 +74,35 @@ instructions text appears in the post-upload confirmation card, worded as contin
   `main` is `20260816170000_atomic_recipe_ingredient_edit.sql` (landed with S-03), so the next
   one is `20260816180000_add_recipe_instructions.sql`.
 - Two-project migration pattern (per F-02's plan, `context/archive/2026-08-15-recipe-data-schema/plan.md`):
-  apply to `SnapRecipe` (dev, ref `xmyeeuyeszvpvrjszohr`) first, verify, then apply to
-  `SnapRecipe_live` (prod, ref `gtrhakzhlammvfifvlyf`) in a later phase.
+  apply to `SnapRecipe` (dev, ref `xmyeeuyeszvpvrjszohr`) first, verify everything end-to-end,
+  then apply all accumulated migrations to `SnapRecipe_live` (prod, ref
+  `gtrhakzhlammvfifvlyf`) in one final phase.
+- `edit_recipe()`'s signature will need a new `p_instructions text default null` parameter and an
+  `instructions = p_instructions` clause in its `update` — `create or replace function` with a
+  default keeps the change additive; the API route (the RPC's only caller) will always pass the
+  parameter explicitly.
 
 ## What We're NOT Doing
 
-- Not touching `src/pages/recipes/[id].astro`, `RecipeEditForm.tsx`, or any other S-02/S-03 file
-  — FR-018 (detail view) and FR-019 (edit) are explicitly deferred to a follow-up plan after
-  those branches merge.
 - Not building a structured step list — instructions are a single freeform text field (decided
   during shaping; see `frame.md` and `change.md`).
-- Not adding a length-based UI truncation/collapse control to `PhotoUploadForm` — full text is
-  always shown.
+- Not adding a length-based UI truncation/collapse control anywhere (`PhotoUploadForm`, detail
+  view, edit form) — full text is always shown.
 - Not backfilling `instructions` for recipes saved before this change — they simply have `null`.
+- Not reworking `edit.astro`'s inline Supabase query to reuse `getRecipeDetail()` — out of scope
+  refactor; extend its existing inline query the same way it already selects `name`/`type`.
+- Not wiring the `GET /api/recipes/[id]` route into `edit.astro` — that's a pre-existing
+  architecture choice (inline query vs. API call) unrelated to this change; only keeping the
+  route's response shape consistent with `PATCH`.
 
 ## Implementation Approach
 
-Additive-only change: one nullable `text` column with a length check constraint, one extra field
-threaded through the extraction service's zod schema/prompt/type, one extra field in the existing
-`recipes` insert + response payload, and one new block in the existing post-upload confirmation
-UI. No new API endpoints, no new database tables, no transaction changes.
+Additive-only change throughout: one nullable `text` column with a length check constraint, one
+extra field threaded through the extraction service's zod schema/prompt/type, one extra field in
+the existing `recipes` insert + response payload, one new block in the post-upload confirmation
+UI, one new block in the detail view, and one new form field (backed by an extended
+`edit_recipe()` RPC) in the edit form. No new API endpoints, no new database tables, no
+transaction changes beyond the existing `edit_recipe()` RPC.
 
 ## Phase 1: Schema migration
 
@@ -94,7 +124,7 @@ existing `recipes` table's soft-delete/timestamp conventions.
 
 #### 2. Apply to dev
 
-**Intent**: Get the new column live in `SnapRecipe` (dev) so local development and Phase 2-4
+**Intent**: Get the new column live in `SnapRecipe` (dev) so local development and Phases 2-6
 work against real schema.
 
 **Contract**: `supabase link --project-ref xmyeeuyeszvpvrjszohr && supabase db push`.
@@ -176,7 +206,7 @@ expected `ExtractionResult` assertions to include `instructions`.
 #### Manual Verification:
 
 - None — fully covered by unit tests; extraction quality against real photos is validated in
-  Phase 4's manual step
+  Phase 4's and Phase 5's manual steps
 
 ---
 
@@ -226,12 +256,11 @@ extraction results and insert/response assertions to include `instructions` — 
 
 ---
 
-## Phase 4: Post-upload confirmation UI + production migration
+## Phase 4: Post-upload confirmation UI
 
 ### Overview
 
-Show the extracted instructions in the existing post-upload success card, and ship the schema
-change to production.
+Show the extracted instructions in the existing post-upload success card.
 
 ### Changes Required:
 
@@ -247,18 +276,10 @@ confirmation card already just omits absent optional data.
 **Contract**: Add a conditional block near lines 121-141 that renders `instructions` as a single
 text block (no truncation, no "show more") when non-null.
 
-#### 2. Apply migration to production
-
-**Intent**: Ship the schema change to `SnapRecipe_live` once dev + code changes are verified.
-
-**Contract**: `supabase link --project-ref gtrhakzhlammvfifvlyf && supabase db push`.
-
 ### Success Criteria:
 
 #### Automated Verification:
 
-- `supabase link --project-ref gtrhakzhlammvfifvlyf` succeeds
-- `supabase db push` applies the migration to production with exit code 0
 - `npm run build` succeeds
 - `npm run lint` passes
 
@@ -268,8 +289,190 @@ text block (no truncation, no "show more") when non-null.
   shows the instructions as continuous prose text
 - Upload a photo where preparation steps aren't legible/visible; confirm the card renders
   normally with no instructions block and no error
-- Confirm an existing (pre-this-change) recipe is unaffected — no crash, no visible regression,
-  `instructions` is simply absent
+
+---
+
+## Phase 5: Detail view (FR-018)
+
+### Overview
+
+Show the recipe's instructions on its detail page.
+
+### Changes Required:
+
+#### 1. DTO
+
+**File**: `src/types.ts`
+
+**Intent**: Extend the hand-authored `RecipeDetailDto` (distinct from the Supabase-generated
+`Database` types above it in the same file) to carry instructions through to the detail view.
+
+**Contract**: `RecipeDetailDto` (lines 309-316) gains `instructions: string | null`.
+
+#### 2. Query service
+
+**File**: `src/lib/services/recipe-query.ts`
+
+**Intent**: Select and map the new column through `getRecipeDetail()` — the only place that
+builds a `RecipeDetailDto`.
+
+**Contract**: The `recipes` select in `getRecipeDetail()` (line 101) gains `instructions`; the
+returned object (lines 135-142) gains `instructions: recipe.instructions`. `listRecipes()` /
+`RecipeSummaryDto` are untouched — the collection view never showed full detail fields and
+doesn't need to start now.
+
+#### 3. Detail page
+
+**File**: `src/pages/recipes/[id].astro`
+
+**Intent**: Render instructions below the ingredients section, following the same heading +
+body pattern as "Składniki" (lines 69-76). Omit the whole section when `instructions` is `null`
+— same empty-state treatment as Phase 4's confirmation card, for consistency across the app.
+
+**Contract**: Add a conditional block after the ingredients `<div>` (after line 76) rendering an
+"Instrukcje przygotowania" heading + the instructions text, only when `recipe.instructions` is
+non-null.
+
+### Success Criteria:
+
+#### Automated Verification:
+
+- `npm run build` succeeds
+- `npm run lint` passes
+
+#### Manual Verification:
+
+- Open the detail view of a recipe with instructions; confirm they render below the ingredients
+- Open the detail view of a recipe without instructions (e.g. one saved before this change);
+  confirm no instructions section renders and nothing else regresses
+
+---
+
+## Phase 6: Edit form (FR-019)
+
+### Overview
+
+Let the user add, edit, or clear a recipe's instructions from the edit page.
+
+### Changes Required:
+
+#### 1. Extend the atomic edit RPC
+
+**File**: `supabase/migrations/20260816190000_edit_recipe_instructions.sql`
+
+**Intent**: Thread instructions through the same atomic update `edit_recipe()` already uses for
+name/type/ingredients, keeping the edit a single transaction.
+
+**Contract**: `create or replace function edit_recipe(p_recipe_id uuid, p_name text, p_type
+recipe_type, p_ingredients text[], p_instructions text default null) ...` — same body as today
+plus `instructions = p_instructions` added to the `update recipes set ...` clause. `default
+null` keeps the signature change additive; re-run the existing `grant execute` for the new
+signature.
+
+#### 2. Apply to dev
+
+**Intent**: Get the updated RPC live in `SnapRecipe` (dev).
+
+**Contract**: `supabase link --project-ref xmyeeuyeszvpvrjszohr && supabase db push`.
+
+#### 3. PATCH route
+
+**File**: `src/pages/api/recipes/[id]/index.ts`
+
+**Intent**: Accept and pass through instructions on edit, with the same best-effort/optional
+treatment as extraction (a user can leave it blank). Also keep `GET`'s response shape consistent
+with `PATCH` even though nothing currently calls `GET` (see "What We're NOT Doing").
+
+**Contract**:
+- `patchSchema` (lines 8-12) gains `instructions: z.string().trim().max(5000).nullable()` —
+  unlike `name`/`ingredients`, empty/omitted is valid (maps to `null`, not a validation error).
+- The `edit_recipe` RPC call (lines 84-89) gains `p_instructions: instructions`.
+- The success response (line 98) gains `instructions`.
+- `GET`'s `recipes` select (line 36) and response (lines 55-58) gain `instructions`.
+
+#### 4. Edit page + form
+
+**File**: `src/pages/recipes/[id]/edit.astro`
+
+**Intent**: Fetch instructions alongside the existing inline query and pass it to the form.
+
+**Contract**: The inline `.select("id, name, type")` (line 18) gains `instructions`; the `recipe`
+object built at lines 30-35 and its type annotation (line 9) gain `instructions: string | null`.
+
+**File**: `src/components/recipes/RecipeEditForm.tsx`
+
+**Intent**: Add a textarea for instructions below the ingredients list, matching the form's
+existing field styling (see the "Nazwa" input, lines 102-113). Optional field — unlike
+ingredients, an empty value is valid and saves as `null` rather than blocking submit.
+
+**Contract**: `RecipeEditFormProps` (lines 10-17) gains `instructions: string | null`; local
+state gains `useState(recipe.instructions ?? "")`; `handleSubmit`'s request body (line 63) gains
+`instructions: instructions.trim() || null`; no new validation error path — instructions has no
+`min(1)` equivalent to `cleanedIngredients`'s check.
+
+#### 5. Update tests
+
+**Files**: `src/pages/api/recipes/[id]/index.test.ts`
+
+**Intent**: Cover the new field in both `GET` and `PATCH`, matching how `type` is covered today.
+
+**Contract**: Extend `"returns the recipe with ordered ingredients"` (line 87) and `"calls the
+atomic edit_recipe RPC and returns the updated recipe on success"` (line 129) to include
+`instructions`.
+
+### Success Criteria:
+
+#### Automated Verification:
+
+- `supabase link --project-ref xmyeeuyeszvpvrjszohr` succeeds
+- `supabase db push` applies the migration with exit code 0
+- `npm run test` passes (`src/pages/api/recipes/[id]/index.test.ts`)
+- `npm run lint` passes
+- `npm run build` succeeds
+
+#### Manual Verification:
+
+- Edit a recipe to add instructions where none existed; save; confirm the detail view now shows
+  them
+- Edit a recipe's existing instructions; save; confirm the change persists and displays
+- Clear a recipe's instructions to empty; save; confirm the detail view shows no instructions
+  section afterward (not an empty one)
+
+---
+
+## Phase 7: Production rollout
+
+### Overview
+
+Ship both migrations (Phase 1's column, Phase 6's RPC update) to production once everything is
+verified in dev.
+
+### Changes Required:
+
+#### 1. Apply migrations to production
+
+**Intent**: Ship the accumulated schema changes to `SnapRecipe_live` in one step, now that the
+full slice (extraction, detail view, edit form) is verified end-to-end in dev.
+
+**Contract**: `supabase link --project-ref gtrhakzhlammvfifvlyf && supabase db push` — applies
+both `20260816180000_add_recipe_instructions.sql` and `20260816190000_edit_recipe_instructions.sql`
+in one push, since neither has been applied to prod yet.
+
+### Success Criteria:
+
+#### Automated Verification:
+
+- `supabase link --project-ref gtrhakzhlammvfifvlyf` succeeds
+- `supabase db push` applies both migrations to production with exit code 0
+- `npm run build` succeeds
+- `npm run lint` passes
+
+#### Manual Verification:
+
+- Confirm an existing (pre-this-change) production recipe is unaffected — detail view renders,
+  edit form loads, `instructions` is simply absent
+- Full regression on production: upload → confirmation shows instructions → detail view shows
+  them → edit changes them → detail view reflects the edit
 
 ---
 
@@ -278,34 +481,44 @@ text block (no truncation, no "show more") when non-null.
 ### Unit Tests:
 
 - Extraction service: instructions present / instructions null, both treated as success
-- API route: insert payload and response include `instructions`
+- POST `/api/recipes`: insert payload and response include `instructions`
+- GET/PATCH `/api/recipes/[id]`: response and RPC call include `instructions`
 
 ### Integration Tests:
 
-- Existing `recipes.test.ts` integration coverage extended, not duplicated
+- Existing `recipes.test.ts` and `[id]/index.test.ts` integration coverage extended, not
+  duplicated
 
 ### Manual Testing Steps:
 
 1. Upload a clear photo of a recipe with numbered or paragraph-style preparation steps; confirm
    instructions appear as prose in the confirmation card
 2. Upload a photo with no visible preparation text (ingredients-only recipe); confirm the recipe
-   still saves and no instructions block renders
-3. Confirm dev and prod Supabase projects both show the new column via Studio
+   still saves and no instructions block renders anywhere
+3. Open that recipe's detail view; confirm instructions appear (or the section is absent, for
+   the no-instructions case)
+4. Edit the recipe: add/change/clear instructions; save; confirm the detail view reflects the
+   change
+5. Confirm dev and prod Supabase projects both show the new column and updated `edit_recipe`
+   function via Studio
 
 ## Performance Considerations
 
-None — single additional text column, no new queries, no new API calls.
+None — one additional text column, one extra RPC parameter, no new queries, no new API calls.
 
 ## Migration Notes
 
-Additive-only: existing rows get `instructions = NULL` automatically; no backfill script needed.
-FR-018 (detail view) and FR-019 (edit form) will need their own schema-consuming changes once
-S-02/S-03 merge — see "What We're NOT Doing".
+Additive-only throughout: existing rows get `instructions = NULL` automatically; no backfill
+script needed. Two migrations ship together: the column (Phase 1) and the `edit_recipe()` RPC
+update (Phase 6) — both applied to dev as they're built, both applied to prod together in
+Phase 7.
 
 ## References
 
 - Frame brief: `context/changes/recipe-prep-instructions/frame.md`
 - Prior schema plan (migration + two-project pattern precedent): `context/archive/2026-08-15-recipe-data-schema/plan.md`
+- S-02 plan (detail view origin): `context/archive/2026-08-16-recipe-search-and-browse/plan.md`
+- S-03 plan (edit form + atomic RPC origin): `context/archive/2026-08-16-recipe-edit-and-remove/plan.md`
 - PRD: `context/foundation/prd.md` FR-021, FR-018, FR-019
 - Roadmap: `context/foundation/roadmap.md` S-04
 
@@ -343,17 +556,56 @@ S-02/S-03 merge — see "What We're NOT Doing".
 - [ ] 3.2 npm run lint passes
 - [ ] 3.3 npm run build succeeds
 
-### Phase 4: Post-upload confirmation UI + production migration
+### Phase 4: Post-upload confirmation UI
 
 #### Automated
 
-- [ ] 4.1 supabase link (prod) succeeds
-- [ ] 4.2 supabase db push applies migration to production
-- [ ] 4.3 npm run build succeeds
-- [ ] 4.4 npm run lint passes
+- [ ] 4.1 npm run build succeeds
+- [ ] 4.2 npm run lint passes
 
 #### Manual
 
-- [ ] 4.5 Upload photo with visible steps; confirm prose renders
-- [ ] 4.6 Upload photo without visible steps; confirm graceful omission
-- [ ] 4.7 Confirm existing recipe unaffected
+- [ ] 4.3 Upload photo with visible steps; confirm prose renders
+- [ ] 4.4 Upload photo without visible steps; confirm graceful omission
+
+### Phase 5: Detail view (FR-018)
+
+#### Automated
+
+- [ ] 5.1 npm run build succeeds
+- [ ] 5.2 npm run lint passes
+
+#### Manual
+
+- [ ] 5.3 Detail view shows instructions when present
+- [ ] 5.4 Detail view omits the section when instructions is null
+
+### Phase 6: Edit form (FR-019)
+
+#### Automated
+
+- [ ] 6.1 supabase link (dev) succeeds
+- [ ] 6.2 supabase db push applies migration
+- [ ] 6.3 npm run test passes ([id]/index.test.ts)
+- [ ] 6.4 npm run lint passes
+- [ ] 6.5 npm run build succeeds
+
+#### Manual
+
+- [ ] 6.6 Add instructions via edit form; detail view reflects it
+- [ ] 6.7 Change existing instructions via edit form; detail view reflects it
+- [ ] 6.8 Clear instructions via edit form; detail view shows no section
+
+### Phase 7: Production rollout
+
+#### Automated
+
+- [ ] 7.1 supabase link (prod) succeeds
+- [ ] 7.2 supabase db push applies both migrations to production
+- [ ] 7.3 npm run build succeeds
+- [ ] 7.4 npm run lint passes
+
+#### Manual
+
+- [ ] 7.5 Existing production recipe unaffected (detail + edit load fine, instructions absent)
+- [ ] 7.6 Full regression: upload → confirmation → detail view → edit → detail view reflects edit

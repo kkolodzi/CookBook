@@ -583,25 +583,25 @@ backfill needed.
 
 #### Automated
 
-- [x] 1.1 Migration applies cleanly against local/dev Supabase project
-- [x] 1.2 Type checking passes
-- [x] 1.3 Linting passes
+- [x] 1.1 Migration applies cleanly against local/dev Supabase project — 4520a9b
+- [x] 1.2 Type checking passes — 4520a9b
+- [x] 1.3 Linting passes — 4520a9b
 
 #### Manual
 
-- [x] 1.4 RLS confirmed enabled and correctly scoped in Supabase dashboard
+- [x] 1.4 RLS confirmed enabled and correctly scoped in Supabase dashboard — 4520a9b
 
 ### Phase 2: Vision Extraction Service
 
 #### Automated
 
-- [ ] 2.1 Type checking passes
-- [ ] 2.2 Linting passes
-- [ ] 2.3 Unit tests for `extractRecipeFromPhoto` pass
+- [x] 2.1 Type checking passes
+- [x] 2.2 Linting passes
+- [x] 2.3 Unit tests for `extractRecipeFromPhoto` pass
 
 #### Manual
 
-- [ ] 2.4 Service called directly with one real recipe photo returns plausible extraction
+- [x] 2.4 Service called directly with one real recipe photo returns plausible extraction
 
 ### Phase 3: API Route — Validation, Rate Limiting & Extraction Orchestration
 

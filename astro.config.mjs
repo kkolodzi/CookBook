@@ -18,6 +18,13 @@ export default defineConfig({
     schema: {
       SUPABASE_URL: envField.string({ context: "server", access: "secret", optional: true }),
       SUPABASE_KEY: envField.string({ context: "server", access: "secret", optional: true }),
+      OPENROUTER_API_KEY: envField.string({ context: "server", access: "secret", optional: true }),
+      OPENROUTER_MODEL: envField.string({
+        context: "server",
+        access: "public",
+        optional: true,
+        default: "google/gemini-2.5-flash",
+      }),
     },
   },
 });

@@ -657,21 +657,21 @@ backfill needed.
 
 #### Automated
 
-- [x] 6.1 Type checking passes
-- [x] 6.2 Linting passes
+- [x] 6.1 Type checking passes — 9442755
+- [x] 6.2 Linting passes — 9442755
 
 #### Manual
 
-- [x] 6.3 Non-recipe and blurry-photo failure tips verified; retry button resets cleanly
+- [x] 6.3 Non-recipe and blurry-photo failure tips verified; retry button resets cleanly — 9442755
 
 ### Phase 7: Type-Confirmation Nudge (cuttable first if time is short)
 
 #### Automated
 
-- [ ] 7.1 Type checking passes
-- [ ] 7.2 Linting passes
-- [ ] 7.3 Integration test: owner PATCH succeeds, non-owner PATCH rejected by RLS
+- [x] 7.1 Type checking passes
+- [x] 7.2 Linting passes
+- [x] 7.3 Integration test: owner PATCH succeeds, non-owner PATCH rejected by RLS
 
 #### Manual
 
-- [ ] 7.4 Type nudge confirmed working end-to-end without page reload
+- [x] 7.4 Type nudge confirmed working end-to-end without page reload

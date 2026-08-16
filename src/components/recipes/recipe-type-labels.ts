@@ -12,3 +12,14 @@ export const RECIPE_TYPE_LABELS: Record<RecipeTypeValue, string> = {
   drink: "Napój",
   other: "Inne",
 };
+
+export const RECIPE_TYPE_VALUES = [
+  "dessert",
+  "soup",
+  "main_course",
+  "salad",
+  "breakfast",
+  "snack",
+  "drink",
+  "other",
+] as const satisfies readonly RecipeTypeValue[];

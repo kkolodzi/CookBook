@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { RECIPE_TYPE_LABELS, type RecipeTypeValue } from "@/components/recipes/recipe-type-labels";
 import { EXTRACTION_FAILURE_COPY, type UploadFailureKey } from "@/components/recipes/extraction-failure-copy";
+import TypeConfirmationNudge from "@/components/recipes/TypeConfirmationNudge";
 import type { ExtractionFailureReason } from "@/lib/services/recipe-extraction";
 
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
@@ -126,9 +127,12 @@ export default function PhotoUploadForm() {
           </ul>
         </div>
         {successData.typeUnconfirmed && (
-          <p className="rounded-lg border border-yellow-400/30 bg-yellow-900/20 px-3 py-2 text-sm text-yellow-200">
-            Nie udało się jednoznacznie rozpoznać typu dania — zapisano jako „Inne”.
-          </p>
+          <TypeConfirmationNudge
+            recipeId={successData.recipe.id}
+            onConfirmed={(type) => {
+              setSuccessData((prev) => (prev ? { recipe: { ...prev.recipe, type }, typeUnconfirmed: false } : prev));
+            }}
+          />
         )}
         <Button onClick={reset} variant="secondary" className="w-full">
           Dodaj kolejny przepis

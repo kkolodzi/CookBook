@@ -1,10 +1,10 @@
 ---
 change_id: recipe-edit-and-remove
 title: Edit and reversibly remove saved recipes
-status: implemented
+status: archived
 created: 2026-08-16
 updated: 2026-08-16
-archived_at: null
+archived_at: 2026-08-16T19:51:18Z
 ---
 
 ## Notes

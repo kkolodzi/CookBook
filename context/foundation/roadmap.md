@@ -33,7 +33,7 @@ Home cooks save recipes on social media but can't find them at meal time — the
 | F-02 | recipe-data-schema       | (foundation) recipe schema with structured ingredients landed    | F-01           | FR-015, FR-008, FR-020                 | done |
 | S-01 | photo-to-recipe-save     | upload a photo, get an AI-extracted recipe saved to collection  | F-01, F-02     | FR-004, FR-005, FR-008, US-01          | done |
 | S-02 | recipe-search-and-browse | search recipes by ingredient, filter by type, view details       | S-01           | FR-013, FR-015, FR-016, FR-018, US-02  | done |
-| S-03 | recipe-edit-and-remove   | edit a saved recipe and remove it reversibly                     | S-01           | FR-019, FR-020                         | in-progress |
+| S-03 | recipe-edit-and-remove   | edit a saved recipe and remove it reversibly                     | S-01           | FR-019, FR-020                         | done |
 
 ## Streams
 
@@ -124,7 +124,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Recovery window for removed recipes: how long (hours, days)? — Owner: builder. Block: no — PRD Open Question 1; any reasonable default ships and is tunable later if F-02 uses a timestamp column.
 - **Risk:** Reversible removal needs some recovery affordance (a "Trash" view, or an undo notification) — that UX choice affects scope. Implementation risk is otherwise low.
-- **Status:** in-progress
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -238,3 +238,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **F-02: (foundation) recipe schema migrated to Supabase: a `recipes` table with name, type, photo reference, and soft-delete markers, plus an independently addressable ingredient list (each ingredient its own row or array element, not a text blob); RLS policies scoped per authenticated user.** — Archived 2026-08-15 → `context/archive/2026-08-15-recipe-data-schema/`. Lesson: —.
 - **S-01: user can upload a photo of a physical recipe from their gallery; the app extracts the recipe name, ingredient list, and type via an AI vision API and saves the result to their personal collection automatically, with clear visible feedback on success or failure.** — Archived 2026-08-16 → `context/archive/2026-08-15-photo-to-recipe-save/`. Lesson: —.
 - **S-02: user can browse the full recipe collection with an empty search, search by ingredient (e.g. "marchewka"), filter by meal type, and view a recipe's full details — name, ingredient list, type, photo, and note.** — Archived 2026-08-16 → `context/archive/2026-08-16-recipe-search-and-browse/`. Lesson: —.
+- **S-03: user can edit a saved recipe's name, ingredient list, type, or note, and can remove a recipe from their collection with the ability to recover it within a defined window.** — Archived 2026-08-16 → `context/archive/2026-08-16-recipe-edit-and-remove/`. Lesson: —.

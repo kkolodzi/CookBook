@@ -303,6 +303,49 @@ created_at >= current_date` via the session-scoped Supabase client — if ≥ 10
 Polish rate-limit message *without* logging an attempt row (the request never reached the
 model); otherwise read the file into an `ArrayBuffer` and call `extractRecipeFromPhoto`.
 
+> **Superseded by the Phase 3 addendum below (item 3)**: the count-then-check cap described
+> here had a TOCTOU race, fixed post-implementation during impl review. See item 3 for what's
+> actually live.
+
+#### 2. GRANT migration & typed Supabase client (addendum — added during implementation)
+
+**Files**: `supabase/migrations/20260816153000_grant_app_tables_to_authenticated.sql`,
+`src/lib/supabase.ts`
+
+**Intent**: Not part of the original plan. Discovered mid-phase during manual verification: the
+raw-SQL migrations that created `recipes`/`recipe_ingredients`/`extraction_attempts` never
+granted the `authenticated` role table-level access — RLS policies narrow *which* rows a role
+can see once it already has access, but never grant that underlying access itself, so every
+query from this phase's route was failing with "permission denied for table ..." before RLS was
+even evaluated. `src/lib/supabase.ts` also gained a `createServerClient<Database>` generic so
+the new typed `.from(...)` queries this phase introduces type-check correctly.
+
+**Contract**: Migration grants `select, insert, update, delete` on `recipes` and
+`recipe_ingredients`, and `select, insert` on `extraction_attempts` (matching each table's own
+RLS policies exactly — no `update`/`delete` grant on `extraction_attempts`, consistent with it
+being an immutable log). Applied to both dev and prod for the tables live in each at the time.
+
+#### 3. Atomic rate-limit enforcement (addendum — added during impl-review triage)
+
+**Files**: `supabase/migrations/20260816160000_atomic_extraction_rate_limit.sql`,
+`src/pages/api/recipes.ts`, `src/types.ts`
+
+**Intent**: Not part of the original plan. The impl-review full-plan pass (2026-08-16) flagged
+a TOCTOU race in item 1's count-then-check cap: concurrent requests within the ~10s extraction
+window all read the same pre-insert count and could all pass, allowing a burst past 10/day.
+Fixed by replacing the count query with a single atomic upsert-increment, reserved *before* the
+extraction call rather than inferred after the fact from the attempts log.
+
+**Contract**: New table `extraction_daily_counters` (`user_id`, `day`, `count`, primary key
+`(user_id, day)`), RLS-enabled with no policies (only ever touched via the function below). New
+`security definer` function `reserve_extraction_attempt(p_cap integer) returns boolean` — reads
+`auth.uid()` itself (never trusts a caller-supplied user id), atomically upserts
+`(user_id, current_date)`'s counter via `insert ... on conflict ... do update set count = count
++ 1 returning count`, and returns whether the new count is still within `p_cap`. Granted
+`execute` to `authenticated`. The route replaces its count-query + manual comparison with a
+single `supabase.rpc("reserve_extraction_attempt", { p_cap: DAILY_ATTEMPT_CAP })` call, treating
+`false` as the existing 429 path.
+
 ### Success Criteria:
 
 #### Automated Verification:

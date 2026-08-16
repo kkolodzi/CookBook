@@ -37,34 +37,39 @@ export const POST: APIRoute = async (context) => {
     return jsonResponse({ error: "Usługa jest tymczasowo niedostępna." }, 503);
   }
 
-  const formData = await context.request.formData();
+  let formData: FormData;
+  try {
+    formData = await context.request.formData();
+  } catch {
+    return jsonResponse({ error: "Wystąpił błąd. Spróbuj ponownie." }, 500);
+  }
   const parsedPhoto = photoSchema.safeParse(formData.get("photo"));
   if (!parsedPhoto.success) {
     return jsonResponse({ error: parsedPhoto.error.issues[0].message }, 400);
   }
   const photo = parsedPhoto.data;
 
-  const todayStart = new Date();
-  todayStart.setUTCHours(0, 0, 0, 0);
+  const { data: withinCap, error: capError } = await supabase.rpc("reserve_extraction_attempt", {
+    p_cap: DAILY_ATTEMPT_CAP,
+  });
 
-  const { count, error: countError } = await supabase
-    .from("extraction_attempts")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", user.id)
-    .gte("created_at", todayStart.toISOString());
-
-  if (countError) {
+  if (capError) {
     return jsonResponse({ error: "Wystąpił błąd. Spróbuj ponownie." }, 500);
   }
 
-  if ((count ?? 0) >= DAILY_ATTEMPT_CAP) {
+  if (!withinCap) {
     return jsonResponse(
       { error: "Osiągnięto dzienny limit 10 prób rozpoznawania przepisów. Spróbuj ponownie jutro." },
       429,
     );
   }
 
-  const bytes = await photo.arrayBuffer();
+  let bytes: ArrayBuffer;
+  try {
+    bytes = await photo.arrayBuffer();
+  } catch {
+    return jsonResponse({ error: "Wystąpił błąd. Spróbuj ponownie." }, 500);
+  }
   const result = await extractRecipeFromPhoto(bytes, photo.type);
 
   if (!result.success) {
@@ -93,6 +98,7 @@ export const POST: APIRoute = async (context) => {
     .single();
 
   if (recipeError) {
+    await supabase.storage.from("recipe-photos").remove([storagePath]);
     return jsonResponse({ error: "Wystąpił błąd podczas zapisu przepisu. Spróbuj ponownie." }, 500);
   }
 
@@ -105,7 +111,16 @@ export const POST: APIRoute = async (context) => {
   const { error: ingredientsError } = await supabase.from("recipe_ingredients").insert(ingredientRows);
 
   if (ingredientsError) {
-    await supabase.from("recipes").delete().eq("id", recipeRow.id);
+    const { error: deleteError } = await supabase.from("recipes").delete().eq("id", recipeRow.id);
+    await supabase.from("extraction_attempts").insert({
+      user_id: user.id,
+      success: false,
+      failure_reason: "technical_error",
+      raw_response: result.raw as Json,
+    });
+    if (deleteError) {
+      return jsonResponse({ error: "Wystąpił błąd podczas zapisu przepisu. Skontaktuj się z pomocą." }, 500);
+    }
     return jsonResponse({ error: "Wystąpił błąd podczas zapisu składników. Spróbuj ponownie." }, 500);
   }
 

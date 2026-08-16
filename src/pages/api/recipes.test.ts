@@ -20,7 +20,7 @@ const { createClient } = await import("@/lib/supabase");
 const { extractRecipeFromPhoto } = await import("@/lib/services/recipe-extraction");
 
 interface MockSupabaseConfig {
-  attemptsCount?: { count: number; error?: unknown };
+  reserveResult?: { data: boolean | null; error?: unknown };
   recipeInsert?: { data: { id: string; name: string; type: string } | null; error?: unknown };
   ingredientsInsertError?: unknown;
   storageUploadError?: unknown;
@@ -28,11 +28,10 @@ interface MockSupabaseConfig {
 
 function mockSupabaseClient(config: MockSupabaseConfig = {}) {
   const extractionAttemptsChain = {
-    select: vi.fn().mockReturnThis(),
-    eq: vi.fn().mockReturnThis(),
-    gte: vi.fn().mockResolvedValue(config.attemptsCount ?? { count: 0, error: null }),
     insert: vi.fn().mockResolvedValue({ error: null }),
   };
+
+  const rpc = vi.fn().mockResolvedValue(config.reserveResult ?? { data: true, error: null });
 
   const recipesChain = {
     insert: vi.fn().mockReturnThis(),
@@ -56,9 +55,10 @@ function mockSupabaseClient(config: MockSupabaseConfig = {}) {
   });
 
   const upload = vi.fn().mockResolvedValue({ error: config.storageUploadError ?? null });
-  const storage = { from: vi.fn().mockReturnValue({ upload }) };
+  const remove = vi.fn().mockResolvedValue({ error: null });
+  const storage = { from: vi.fn().mockReturnValue({ upload, remove }) };
 
-  return { from, storage, extractionAttemptsChain, recipesChain, ingredientsChain, upload };
+  return { from, rpc, storage, extractionAttemptsChain, recipesChain, ingredientsChain, upload, remove };
 }
 
 function makeContext(options: { user?: { id: string } | null; formData?: FormData }): APIContext {
@@ -110,7 +110,7 @@ describe("POST /api/recipes", () => {
   });
 
   it("returns 429 when the daily attempt cap is reached", async () => {
-    vi.mocked(createClient).mockReturnValue(mockSupabaseClient({ attemptsCount: { count: 10 } }) as never);
+    vi.mocked(createClient).mockReturnValue(mockSupabaseClient({ reserveResult: { data: false } }) as never);
 
     const response = await POST(makeContext({ formData: photoFormData(samplePhoto()) }));
 
@@ -168,6 +168,23 @@ describe("POST /api/recipes", () => {
     expect(client.recipesChain.insert).toHaveBeenCalledWith(expect.objectContaining({ type: "other" }));
   });
 
+  it("removes the uploaded photo from storage when the recipes insert fails", async () => {
+    const client = mockSupabaseClient({ recipeInsert: { data: null, error: { message: "insert failed" } } });
+    vi.mocked(createClient).mockReturnValue(client as never);
+    vi.mocked(extractRecipeFromPhoto).mockResolvedValue({
+      success: true,
+      name: "Zupa",
+      type: "soup",
+      ingredients: ["marchew"],
+      raw: {},
+    });
+
+    const response = await POST(makeContext({ formData: photoFormData(samplePhoto()) }));
+
+    expect(response.status).toBe(500);
+    expect(client.remove).toHaveBeenCalledOnce();
+  });
+
   it("logs a failed attempt and has no recipe/ingredient/storage side effects on a classified extraction failure", async () => {
     const client = mockSupabaseClient();
     vi.mocked(createClient).mockReturnValue(client as never);
@@ -205,5 +222,8 @@ describe("POST /api/recipes", () => {
     expect(response.status).toBe(500);
     expect(client.recipesChain.delete).toHaveBeenCalledOnce();
     expect(client.recipesChain.eq).toHaveBeenCalledWith("id", "recipe-3");
+    expect(client.extractionAttemptsChain.insert).toHaveBeenCalledWith(
+      expect.objectContaining({ success: false, failure_reason: "technical_error" }),
+    );
   });
 });

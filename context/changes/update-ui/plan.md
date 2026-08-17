@@ -463,8 +463,8 @@ None — no schema or data changes in this plan.
 
 #### Automated
 
-- [x] 3.1 npm run build succeeds
-- [x] 3.2 npm run lint passes
+- [x] 3.1 npm run build succeeds — 99971e6
+- [x] 3.2 npm run lint passes — 99971e6
 
 #### Manual
 
@@ -475,9 +475,9 @@ None — no schema or data changes in this plan.
 
 #### Automated
 
-- [ ] 4.1 npm run test passes (recipes.test.ts)
-- [ ] 4.2 npm run build succeeds
-- [ ] 4.3 npm run lint passes
+- [x] 4.1 npm run test passes (recipes.test.ts)
+- [x] 4.2 npm run build succeeds
+- [x] 4.3 npm run lint passes
 
 #### Manual
 

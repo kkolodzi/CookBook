@@ -3,8 +3,8 @@ import type { Database, RecipeDetailDto, RecipeIngredientDto, RecipeSummaryDto }
 
 type RecipeTypeValue = Database["public"]["Enums"]["recipe_type"];
 
-const RECIPE_PHOTOS_BUCKET = "recipe-photos";
-const SIGNED_URL_TTL_SECONDS = 3600;
+export const RECIPE_PHOTOS_BUCKET = "recipe-photos";
+export const SIGNED_URL_TTL_SECONDS = 3600;
 const LIST_RESULT_CAP = 200;
 
 interface ListRecipesParams {

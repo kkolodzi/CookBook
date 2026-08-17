@@ -15,7 +15,11 @@ vi.mock("@/lib/services/recipe-extraction", async (importOriginal) => {
   return { ...actual, extractRecipeFromPhoto: vi.fn() };
 });
 
-vi.mock("@/lib/services/recipe-query", () => ({ listRecipes: vi.fn() }));
+vi.mock("@/lib/services/recipe-query", () => ({
+  listRecipes: vi.fn(),
+  RECIPE_PHOTOS_BUCKET: "recipe-photos",
+  SIGNED_URL_TTL_SECONDS: 3600,
+}));
 
 const { GET, POST } = await import("./recipes");
 const { createClient } = await import("@/lib/supabase");
@@ -30,6 +34,7 @@ interface MockSupabaseConfig {
   };
   ingredientsInsertError?: unknown;
   storageUploadError?: unknown;
+  signedPhotoUrl?: string | null;
 }
 
 function mockSupabaseClient(config: MockSupabaseConfig = {}) {
@@ -65,9 +70,28 @@ function mockSupabaseClient(config: MockSupabaseConfig = {}) {
 
   const upload = vi.fn().mockResolvedValue({ error: config.storageUploadError ?? null });
   const remove = vi.fn().mockResolvedValue({ error: null });
-  const storage = { from: vi.fn().mockReturnValue({ upload, remove }) };
+  const createSignedUrl = vi.fn().mockResolvedValue({
+    data:
+      config.signedPhotoUrl === undefined
+        ? { signedUrl: "https://signed.example/photo.jpg" }
+        : config.signedPhotoUrl === null
+          ? null
+          : { signedUrl: config.signedPhotoUrl },
+    error: null,
+  });
+  const storage = { from: vi.fn().mockReturnValue({ upload, remove, createSignedUrl }) };
 
-  return { from, rpc, storage, extractionAttemptsChain, recipesChain, ingredientsChain, upload, remove };
+  return {
+    from,
+    rpc,
+    storage,
+    extractionAttemptsChain,
+    recipesChain,
+    ingredientsChain,
+    upload,
+    remove,
+    createSignedUrl,
+  };
 }
 
 function makeContext(options: {
@@ -162,6 +186,7 @@ describe("POST /api/recipes", () => {
         type: "soup",
         ingredients: ["marchew", "cebula"],
         instructions: "Ugotuj warzywa.",
+        photoUrl: "https://signed.example/photo.jpg",
       },
       typeUnconfirmed: false,
     });
@@ -191,10 +216,33 @@ describe("POST /api/recipes", () => {
     });
 
     const response = await POST(makeContext({ formData: photoFormData(samplePhoto()) }));
-    const body = (await response.json()) as { typeUnconfirmed: boolean };
+    const body = (await response.json()) as { typeUnconfirmed: boolean; recipe: { photoUrl: string | null } };
 
     expect(body.typeUnconfirmed).toBe(true);
+    expect(body.recipe.photoUrl).toBe("https://signed.example/photo.jpg");
     expect(client.recipesChain.insert).toHaveBeenCalledWith(expect.objectContaining({ type: "other" }));
+  });
+
+  it("degrades to a null photoUrl instead of failing when signing the photo fails", async () => {
+    const client = mockSupabaseClient({
+      recipeInsert: { data: { id: "recipe-1", name: "Zupa", type: "soup", instructions: null } },
+      signedPhotoUrl: null,
+    });
+    vi.mocked(createClient).mockReturnValue(client as never);
+    vi.mocked(extractRecipeFromPhoto).mockResolvedValue({
+      success: true,
+      name: "Zupa",
+      type: "soup",
+      ingredients: ["marchew"],
+      instructions: null,
+      raw: {},
+    });
+
+    const response = await POST(makeContext({ formData: photoFormData(samplePhoto()) }));
+    const body = (await response.json()) as { recipe: { photoUrl: string | null } };
+
+    expect(response.status).toBe(200);
+    expect(body.recipe.photoUrl).toBeNull();
   });
 
   it("removes the uploaded photo from storage when the recipes insert fails", async () => {

@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase";
 import { extractRecipeFromPhoto, SUPPORTED_MIME_TYPES } from "@/lib/services/recipe-extraction";
-import { listRecipes } from "@/lib/services/recipe-query";
+import { listRecipes, RECIPE_PHOTOS_BUCKET, SIGNED_URL_TTL_SECONDS } from "@/lib/services/recipe-query";
 import { RECIPE_TYPE_VALUES } from "@/components/recipes/recipe-type-labels";
 import type { Json } from "@/types";
 
@@ -168,6 +168,10 @@ export const POST: APIRoute = async (context) => {
     recipe_id: recipeRow.id,
   });
 
+  const { data: signedPhoto } = await supabase.storage
+    .from(RECIPE_PHOTOS_BUCKET)
+    .createSignedUrl(storagePath, SIGNED_URL_TTL_SECONDS);
+
   return jsonResponse(
     {
       success: true,
@@ -177,6 +181,7 @@ export const POST: APIRoute = async (context) => {
         type: recipeRow.type,
         ingredients: result.ingredients,
         instructions: recipeRow.instructions,
+        photoUrl: signedPhoto?.signedUrl ?? null,
       },
       typeUnconfirmed: result.type === null,
     },

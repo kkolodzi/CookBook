@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { ImagePlus, Loader2, CircleCheck, CircleAlert } from "lucide-react";
+import { ImagePlus, ImageOff, Loader2, CircleCheck, CircleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { RECIPE_TYPE_LABELS, type RecipeTypeValue } from "@/components/recipes/recipe-type-labels";
@@ -19,6 +19,7 @@ interface SavedRecipe {
   type: RecipeTypeValue;
   ingredients: string[];
   instructions: string | null;
+  photoUrl: string | null;
 }
 
 interface SuccessData {
@@ -119,6 +120,17 @@ export default function PhotoUploadForm() {
           <p className="font-medium">Przepis zapisany!</p>
         </div>
         <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+          <div className="mb-3 flex aspect-video items-center justify-center overflow-hidden rounded-md bg-black/20">
+            {successData.recipe.photoUrl ? (
+              <img
+                src={successData.recipe.photoUrl}
+                alt={successData.recipe.name}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <ImageOff className="size-8 text-white/30" />
+            )}
+          </div>
           <p className="text-lg font-semibold">{successData.recipe.name}</p>
           <p className="text-sm text-blue-100/70">{RECIPE_TYPE_LABELS[successData.recipe.type]}</p>
           <ul className="mt-3 list-inside list-disc space-y-1 text-sm text-blue-100/80">

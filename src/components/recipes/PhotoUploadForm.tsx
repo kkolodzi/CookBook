@@ -18,6 +18,7 @@ interface SavedRecipe {
   name: string;
   type: RecipeTypeValue;
   ingredients: string[];
+  instructions: string | null;
 }
 
 interface SuccessData {
@@ -125,6 +126,12 @@ export default function PhotoUploadForm() {
               <li key={ingredient}>{ingredient}</li>
             ))}
           </ul>
+          {successData.recipe.instructions && (
+            <div className="mt-3 border-t border-white/10 pt-3">
+              <p className="text-sm font-medium text-blue-100/90">Instrukcje przygotowania</p>
+              <p className="mt-1 text-sm whitespace-pre-line text-blue-100/80">{successData.recipe.instructions}</p>
+            </div>
+          )}
         </div>
         {successData.typeUnconfirmed && (
           <TypeConfirmationNudge

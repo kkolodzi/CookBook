@@ -552,16 +552,16 @@ Phase 7.
 
 #### Automated
 
-- [x] 3.1 npm run test passes (recipes.test.ts)
-- [x] 3.2 npm run lint passes
-- [x] 3.3 npm run build succeeds
+- [x] 3.1 npm run test passes (recipes.test.ts) — 08d92ed
+- [x] 3.2 npm run lint passes — 08d92ed
+- [x] 3.3 npm run build succeeds — 08d92ed
 
 ### Phase 4: Post-upload confirmation UI
 
 #### Automated
 
-- [ ] 4.1 npm run build succeeds
-- [ ] 4.2 npm run lint passes
+- [x] 4.1 npm run build succeeds
+- [x] 4.2 npm run lint passes
 
 #### Manual
 

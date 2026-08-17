@@ -9,6 +9,7 @@ const patchSchema = z.object({
   name: z.string().trim().min(1, "Podaj nazwę przepisu."),
   type: z.enum(RECIPE_TYPE_VALUES, { message: "Nieprawidłowy typ dania." }),
   ingredients: z.array(z.string().trim().min(1)).min(1, "Podaj co najmniej jeden składnik."),
+  instructions: z.string().trim().max(5000).nullable(),
 });
 
 function jsonResponse(body: unknown, status: number): Response {
@@ -33,7 +34,7 @@ export const GET: APIRoute = async (context) => {
 
   const { data: recipe, error: recipeError } = await supabase
     .from("recipes")
-    .select("id, name, type")
+    .select("id, name, type, instructions")
     .eq("id", id)
     .is("deleted_at", null)
     .single();
@@ -53,7 +54,13 @@ export const GET: APIRoute = async (context) => {
   }
 
   return jsonResponse(
-    { id: recipe.id, name: recipe.name, type: recipe.type, ingredients: ingredients.map((i) => i.name) },
+    {
+      id: recipe.id,
+      name: recipe.name,
+      type: recipe.type,
+      ingredients: ingredients.map((i) => i.name),
+      instructions: recipe.instructions,
+    },
     200,
   );
 };
@@ -79,13 +86,14 @@ export const PATCH: APIRoute = async (context) => {
   if (!parsedBody.success) {
     return jsonResponse({ error: parsedBody.error.issues[0].message }, 400);
   }
-  const { name, type, ingredients } = parsedBody.data;
+  const { name, type, ingredients, instructions } = parsedBody.data;
 
   const { data: success, error: editError } = await supabase.rpc("edit_recipe", {
     p_recipe_id: id,
     p_name: name,
     p_type: type,
     p_ingredients: ingredients,
+    p_instructions: instructions ?? undefined,
   });
 
   if (editError) {
@@ -95,7 +103,7 @@ export const PATCH: APIRoute = async (context) => {
     return jsonResponse({ error: "Nie znaleziono przepisu." }, 404);
   }
 
-  return jsonResponse({ id, name, type, ingredients }, 200);
+  return jsonResponse({ id, name, type, ingredients, instructions }, 200);
 };
 
 export const DELETE: APIRoute = async (context) => {

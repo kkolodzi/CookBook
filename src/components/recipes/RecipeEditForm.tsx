@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ArrowDown, ArrowUp, CircleAlert, CircleCheck, Loader2, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { RECIPE_TYPE_LABELS, RECIPE_TYPE_VALUES, type RecipeTypeValue } from "@/components/recipes/recipe-type-labels";
 
@@ -13,6 +14,7 @@ interface RecipeEditFormProps {
     name: string;
     type: RecipeTypeValue;
     ingredients: string[];
+    instructions: string | null;
   };
 }
 
@@ -22,6 +24,7 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
   const [name, setName] = useState(recipe.name);
   const [type, setType] = useState<RecipeTypeValue>(recipe.type);
   const [ingredients, setIngredients] = useState<string[]>(recipe.ingredients.length > 0 ? recipe.ingredients : [""]);
+  const [instructions, setInstructions] = useState(recipe.instructions ?? "");
   const [status, setStatus] = useState<Status>("idle");
   const [validationError, setValidationError] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -70,7 +73,12 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
       const response = await fetch(`/api/recipes/${recipe.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: trimmedName, type, ingredients: cleanedIngredients }),
+        body: JSON.stringify({
+          name: trimmedName,
+          type,
+          ingredients: cleanedIngredients,
+          instructions: instructions.trim() || null,
+        }),
       });
       const body = (await response.json().catch(() => null)) as { error?: string } | null;
 
@@ -203,6 +211,21 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
           <Plus className="size-4" />
           Dodaj składnik
         </Button>
+      </div>
+
+      <div className="space-y-1">
+        <label htmlFor="instructions" className="text-sm text-blue-100/70">
+          Instrukcje przygotowania
+        </label>
+        <Textarea
+          id="instructions"
+          value={instructions}
+          onChange={(e) => {
+            setInstructions(e.target.value);
+          }}
+          placeholder="np. Ugotuj warzywa, następnie zmiksuj i dopraw do smaku."
+          className="min-h-32 text-white"
+        />
       </div>
 
       <Button

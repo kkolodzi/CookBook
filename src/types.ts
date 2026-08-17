@@ -143,6 +143,7 @@ export type Database = {
           p_name: string;
           p_type: Database["public"]["Enums"]["recipe_type"];
           p_ingredients: string[];
+          p_instructions?: string;
         };
         Returns: boolean;
       };

@@ -6,7 +6,13 @@ import type { RecipeTypeValue } from "@/components/recipes/recipe-type-labels";
 
 const { id } = Astro.params;
 
-let recipe: { id: string; name: string; type: RecipeTypeValue; ingredients: string[] } | null = null;
+let recipe: {
+  id: string;
+  name: string;
+  type: RecipeTypeValue;
+  ingredients: string[];
+  instructions: string | null;
+} | null = null;
 let loadError: string | null = null;
 
 const supabase = id ? createClient(Astro.request.headers, Astro.cookies) : null;
@@ -15,7 +21,7 @@ if (id && !supabase) {
 } else if (id && supabase) {
   const { data: recipeRow, error: recipeError } = await supabase
     .from("recipes")
-    .select("id, name, type")
+    .select("id, name, type, instructions")
     .eq("id", id)
     .is("deleted_at", null)
     .single();
@@ -32,6 +38,7 @@ if (id && !supabase) {
       name: recipeRow.name,
       type: recipeRow.type,
       ingredients: (ingredientRows ?? []).map((i) => i.name),
+      instructions: recipeRow.instructions,
     };
   }
 }

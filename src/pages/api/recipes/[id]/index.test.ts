@@ -9,7 +9,10 @@ const { GET, PATCH, DELETE } = await import("./index");
 const { createClient } = await import("@/lib/supabase");
 
 interface MockConfig {
-  recipeSelect?: { data: { id: string; name: string; type: string } | null; error?: unknown };
+  recipeSelect?: {
+    data: { id: string; name: string; type: string; instructions?: string | null } | null;
+    error?: unknown;
+  };
   ingredientsSelect?: { data: { name: string }[] | null; error?: unknown };
   recipeUpdate?: { data: { id: string } | null; error?: unknown };
   rpcResult?: { data: boolean | null; error?: unknown };
@@ -21,12 +24,13 @@ function mockSupabaseClient(config: MockConfig = {}) {
     update: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
     is: vi.fn().mockReturnThis(),
-    single: vi
-      .fn()
-      .mockResolvedValue(
-        config.recipeSelect ??
-          config.recipeUpdate ?? { data: { id: "recipe-1", name: "Zupa", type: "soup" }, error: null },
-      ),
+    single: vi.fn().mockResolvedValue(
+      config.recipeSelect ??
+        config.recipeUpdate ?? {
+          data: { id: "recipe-1", name: "Zupa", type: "soup", instructions: null },
+          error: null,
+        },
+    ),
   };
 
   const ingredientsChain = {
@@ -62,7 +66,12 @@ function makeContext(options: {
   } as unknown as APIContext;
 }
 
-const validPatchBody = { name: "Nowa Zupa", type: "soup", ingredients: ["marchew", "cebula"] };
+const validPatchBody = {
+  name: "Nowa Zupa",
+  type: "soup",
+  ingredients: ["marchew", "cebula"],
+  instructions: "Ugotuj warzywa.",
+};
 
 describe("GET /api/recipes/[id]", () => {
   beforeEach(() => {
@@ -86,7 +95,10 @@ describe("GET /api/recipes/[id]", () => {
 
   it("returns the recipe with ordered ingredients", async () => {
     const client = mockSupabaseClient({
-      recipeSelect: { data: { id: "recipe-1", name: "Zupa", type: "soup" }, error: null },
+      recipeSelect: {
+        data: { id: "recipe-1", name: "Zupa", type: "soup", instructions: "Ugotuj warzywa." },
+        error: null,
+      },
       ingredientsSelect: { data: [{ name: "marchew" }, { name: "cebula" }], error: null },
     });
     vi.mocked(createClient).mockReturnValue(client as never);
@@ -95,7 +107,13 @@ describe("GET /api/recipes/[id]", () => {
     const body = (await response.json()) as { id: string; ingredients: string[] };
 
     expect(response.status).toBe(200);
-    expect(body).toEqual({ id: "recipe-1", name: "Zupa", type: "soup", ingredients: ["marchew", "cebula"] });
+    expect(body).toEqual({
+      id: "recipe-1",
+      name: "Zupa",
+      type: "soup",
+      ingredients: ["marchew", "cebula"],
+      instructions: "Ugotuj warzywa.",
+    });
   });
 });
 
@@ -134,12 +152,19 @@ describe("PATCH /api/recipes/[id]", () => {
     const body = (await response.json()) as { id: string; name: string; ingredients: string[] };
 
     expect(response.status).toBe(200);
-    expect(body).toEqual({ id: "recipe-1", name: "Nowa Zupa", type: "soup", ingredients: ["marchew", "cebula"] });
+    expect(body).toEqual({
+      id: "recipe-1",
+      name: "Nowa Zupa",
+      type: "soup",
+      ingredients: ["marchew", "cebula"],
+      instructions: "Ugotuj warzywa.",
+    });
     expect(client.rpc).toHaveBeenCalledWith("edit_recipe", {
       p_recipe_id: "recipe-1",
       p_name: "Nowa Zupa",
       p_type: "soup",
       p_ingredients: ["marchew", "cebula"],
+      p_instructions: "Ugotuj warzywa.",
     });
   });
 

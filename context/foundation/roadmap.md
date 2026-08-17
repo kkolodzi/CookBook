@@ -98,7 +98,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Parallel with:** —
 - **Blockers:** —
 - **Unknowns:** — none open. Provider chosen (OpenRouter, see Open Roadmap Question 1); Polish extraction quality validated during manual testing 2026-08-16 (see Candidate Ideas below for gaps found, not blockers).
-- **Risk:** Resolved — implemented and archived. Extraction works well enough to ship, but manual testing surfaced two scope gaps now tracked as Candidate Ideas (no prep instructions; quantities not independently addressable).
+- **Risk:** Resolved — implemented and archived. Extraction works well enough to ship; manual testing surfaced two scope gaps, one of which (no prep instructions) shipped as S-04, the other (quantities not independently addressable) remains Parked.
 - **Status:** done
 
 ### S-02: Recipe search, type filter, and detail view
@@ -159,13 +159,6 @@ Foundations below assume these are present and do NOT re-scaffold them.
 > Surfaced during S-01 manual testing (2026-08-16). Not yet triaged into Slices — not scoped,
 > not estimated. Candidates for a future `/10x-shape` or `/10x-plan` pass.
 
-- **[Requirement gap] Recipe has no preparation instructions/steps** — framed via `/10x-frame`
-  (2026-08-16, HIGH confidence): not an S-01 bug — FR-005 never specified capturing steps, so
-  nothing downstream could have captured them. No FR, no Socrates note, no schema-plan mention
-  anywhere considers and rejects this; it was simply never raised. Real core-value gap (a
-  "recipe" without steps has limited usefulness). Reclassified from "[Bug]" — see
-  `context/changes/recipe-prep-instructions/frame.md`. Next: `/10x-shape` to decide scope
-  (structured step list vs. freeform text) and priority as a PRD amendment.
 - **[Feature] Dashboard — favorite recipes** — let users mark/star recipes as favorites and
   surface them on the dashboard. Depends on S-02 existing (a collection view to favorite from).
 - **[Feature] PDF recipe upload** — extend FR-004 (currently photo-only: JPEG/PNG) to also
@@ -222,6 +215,23 @@ Foundations below assume these are present and do NOT re-scaffold them.
   `/10x-plan` pass to choose an approach (offset/cursor-based `GET /api/recipes` params +
   infinite scroll vs. a simpler "load more" button) — a real API contract change, not a
   UI-only tweak.
+- **[UX] No photo thumbnail shown after upload** — surfaced during S-04 manual testing
+  (2026-08-17). The post-upload success card (`PhotoUploadForm.tsx`) shows name/type/ingredients/
+  instructions but never the photo itself, so there's no visual confirmation of which photo was
+  just uploaded — easy to lose track of when uploading several recipes in a row. `POST
+  /api/recipes`'s success response doesn't currently include a photo URL at all (only
+  `id, name, type, ingredients, instructions`), so this needs a signed-URL addition to that
+  response (see `getRecipeDetail`'s pattern in `recipe-query.ts`) before the UI can render a
+  thumbnail. Likely also worth showing a thumbnail in the recipe list (`RecipeBrowser.tsx`)
+  and/or a local preview of the picked file before upload, but the confirmation-card case is the
+  one directly reported. Needs a `/10x-plan` pass to scope which surface(s).
+- **[Bug] Recipe list doesn't reflect a just-added recipe after navigating back to it** —
+  surfaced during S-04 manual testing (2026-08-17). After adding a recipe from `/recipes/new`
+  and navigating to the recipe list (`/recipes`), the new recipe doesn't appear — root cause not
+  yet investigated (candidates: `RecipeBrowser.tsx` fetching once on mount with no refetch-on-
+  navigation, a caching layer, or Astro page/data caching on `/recipes`). Needs reproduction and
+  root-cause investigation — likely a `/10x-frame` pass first given the cause is unconfirmed —
+  before scoping a fix.
 
 ## Parked
 

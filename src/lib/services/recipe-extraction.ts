@@ -6,7 +6,14 @@ export type RecipeTypeValue = Database["public"]["Enums"]["recipe_type"];
 export type ExtractionFailureReason = Database["public"]["Enums"]["extraction_failure_reason"];
 
 export type ExtractionResult =
-  | { success: true; name: string; type: RecipeTypeValue | null; ingredients: string[]; raw: unknown }
+  | {
+      success: true;
+      name: string;
+      type: RecipeTypeValue | null;
+      ingredients: string[];
+      instructions: string | null;
+      raw: unknown;
+    }
   | { success: false; reason: ExtractionFailureReason; raw: unknown };
 
 const EXTRACTION_TIMEOUT_MS = 10_000;
@@ -40,6 +47,7 @@ const modelResponseSchema = z
     name: z.string().nullable(),
     type: z.enum(RECIPE_TYPES).nullable(),
     ingredients: z.array(z.string()),
+    instructions: z.string().trim().max(5000).nullable(),
   })
   .refine((value) => value.is_recipe || value.not_recipe_reason !== null, {
     message: "not_recipe_reason is required when is_recipe is false",
@@ -58,6 +66,7 @@ Respond with ONLY a single JSON object (no markdown, no code fences, no commenta
   "name": the recipe's dish name as written in the source, or null if it cannot be determined,
   "type": your best-guess meal type, one of "dessert" | "soup" | "main_course" | "salad" | "breakfast" | "snack" | "drink" | "other" — or null if you are not reasonably confident,
   "ingredients": an array of individual ingredient strings as written in the source, each ingredient as its own array entry (keep quantities if present); an empty array if none could be read
+  "instructions": the preparation/cooking steps, rewritten as continuous flowing-paragraph prose in the source language (do not preserve numbered-step or line-break formatting from the source), or null if no preparation steps are visible in the photo
 }
 
 Only set is_recipe to false if you genuinely cannot extract a name and at least one ingredient.`;
@@ -137,7 +146,7 @@ export async function extractRecipeFromPhoto(imageBytes: ArrayBuffer, mimeType: 
       return { success: false, reason: "technical_error", raw: parsedContent };
     }
 
-    const { is_recipe, not_recipe_reason, name, type, ingredients } = parsed.data;
+    const { is_recipe, not_recipe_reason, name, type, ingredients, instructions } = parsed.data;
 
     if (!is_recipe) {
       // Schema refinement guarantees not_recipe_reason is set whenever is_recipe is false.
@@ -148,7 +157,7 @@ export async function extractRecipeFromPhoto(imageBytes: ArrayBuffer, mimeType: 
       return { success: false, reason: "incomplete_extraction", raw: parsedContent };
     }
 
-    return { success: true, name, type, ingredients, raw: parsedContent };
+    return { success: true, name, type, ingredients, instructions, raw: parsedContent };
   } catch {
     // Covers AbortError (timeout) and any network-level failure.
     return { success: false, reason: "technical_error", raw: null };

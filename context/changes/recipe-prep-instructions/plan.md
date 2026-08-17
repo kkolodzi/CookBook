@@ -531,10 +531,10 @@ Phase 7.
 
 #### Automated
 
-- [x] 1.1 supabase link (dev) succeeds
-- [x] 1.2 supabase db push applies migration
-- [x] 1.3 npm run build succeeds
-- [x] 1.4 npm run lint passes
+- [x] 1.1 supabase link (dev) succeeds — f25419f
+- [x] 1.2 supabase db push applies migration — f25419f
+- [x] 1.3 npm run build succeeds — f25419f
+- [x] 1.4 npm run lint passes — f25419f
 
 #### Manual
 
@@ -544,9 +544,9 @@ Phase 7.
 
 #### Automated
 
-- [ ] 2.1 npm run test passes (recipe-extraction.test.ts)
-- [ ] 2.2 npm run lint passes
-- [ ] 2.3 npm run build succeeds
+- [x] 2.1 npm run test passes (recipe-extraction.test.ts)
+- [x] 2.2 npm run lint passes
+- [x] 2.3 npm run build succeeds
 
 ### Phase 3: API route persistence
 

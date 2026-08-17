@@ -33,6 +33,7 @@ describe("extractRecipeFromPhoto", () => {
       name: "Barszcz czerwony",
       type: "soup",
       ingredients: ["buraki", "woda", "sol"],
+      instructions: "Ugotuj buraki w wodzie z solą, następnie zmiksuj i podawaj na gorąco.",
     };
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(mockFetchResponse(chatCompletion(modelPayload))));
 
@@ -43,6 +44,30 @@ describe("extractRecipeFromPhoto", () => {
       name: "Barszcz czerwony",
       type: "soup",
       ingredients: ["buraki", "woda", "sol"],
+      instructions: "Ugotuj buraki w wodzie z solą, następnie zmiksuj i podawaj na gorąco.",
+      raw: modelPayload,
+    });
+  });
+
+  it("maps a well-formed model response with no visible instructions to success with instructions null", async () => {
+    const modelPayload = {
+      is_recipe: true,
+      not_recipe_reason: null,
+      name: "Sałatka jarzynowa",
+      type: "salad",
+      ingredients: ["ziemniaki", "marchew", "groszek"],
+      instructions: null,
+    };
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(mockFetchResponse(chatCompletion(modelPayload))));
+
+    const result = await extractRecipeFromPhoto(imageBytes, "image/jpeg");
+
+    expect(result).toEqual({
+      success: true,
+      name: "Sałatka jarzynowa",
+      type: "salad",
+      ingredients: ["ziemniaki", "marchew", "groszek"],
+      instructions: null,
       raw: modelPayload,
     });
   });
@@ -54,6 +79,7 @@ describe("extractRecipeFromPhoto", () => {
       name: "Nieznana zupa",
       type: null,
       ingredients: [],
+      instructions: null,
     };
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(mockFetchResponse(chatCompletion(modelPayload))));
 

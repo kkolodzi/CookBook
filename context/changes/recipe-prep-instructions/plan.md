@@ -544,17 +544,17 @@ Phase 7.
 
 #### Automated
 
-- [x] 2.1 npm run test passes (recipe-extraction.test.ts)
-- [x] 2.2 npm run lint passes
-- [x] 2.3 npm run build succeeds
+- [x] 2.1 npm run test passes (recipe-extraction.test.ts) — 18ae153
+- [x] 2.2 npm run lint passes — 18ae153
+- [x] 2.3 npm run build succeeds — 18ae153
 
 ### Phase 3: API route persistence
 
 #### Automated
 
-- [ ] 3.1 npm run test passes (recipes.test.ts)
-- [ ] 3.2 npm run lint passes
-- [ ] 3.3 npm run build succeeds
+- [x] 3.1 npm run test passes (recipes.test.ts)
+- [x] 3.2 npm run lint passes
+- [x] 3.3 npm run build succeeds
 
 ### Phase 4: Post-upload confirmation UI
 

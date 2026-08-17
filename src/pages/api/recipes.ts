@@ -124,8 +124,14 @@ export const POST: APIRoute = async (context) => {
 
   const { data: recipeRow, error: recipeError } = await supabase
     .from("recipes")
-    .insert({ user_id: user.id, name: result.name, type: result.type ?? "other", photo_path: storagePath })
-    .select("id, name, type")
+    .insert({
+      user_id: user.id,
+      name: result.name,
+      type: result.type ?? "other",
+      photo_path: storagePath,
+      instructions: result.instructions,
+    })
+    .select("id, name, type, instructions")
     .single();
 
   if (recipeError) {
@@ -165,7 +171,13 @@ export const POST: APIRoute = async (context) => {
   return jsonResponse(
     {
       success: true,
-      recipe: { id: recipeRow.id, name: recipeRow.name, type: recipeRow.type, ingredients: result.ingredients },
+      recipe: {
+        id: recipeRow.id,
+        name: recipeRow.name,
+        type: recipeRow.type,
+        ingredients: result.ingredients,
+        instructions: recipeRow.instructions,
+      },
       typeUnconfirmed: result.type === null,
     },
     200,

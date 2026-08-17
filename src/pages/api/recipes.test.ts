@@ -24,7 +24,10 @@ const { listRecipes } = await import("@/lib/services/recipe-query");
 
 interface MockSupabaseConfig {
   reserveResult?: { data: boolean | null; error?: unknown };
-  recipeInsert?: { data: { id: string; name: string; type: string } | null; error?: unknown };
+  recipeInsert?: {
+    data: { id: string; name: string; type: string; instructions?: string | null } | null;
+    error?: unknown;
+  };
   ingredientsInsertError?: unknown;
   storageUploadError?: unknown;
 }
@@ -39,9 +42,12 @@ function mockSupabaseClient(config: MockSupabaseConfig = {}) {
   const recipesChain = {
     insert: vi.fn().mockReturnThis(),
     select: vi.fn().mockReturnThis(),
-    single: vi
-      .fn()
-      .mockResolvedValue(config.recipeInsert ?? { data: { id: "recipe-1", name: "Zupa", type: "soup" }, error: null }),
+    single: vi.fn().mockResolvedValue(
+      config.recipeInsert ?? {
+        data: { id: "recipe-1", name: "Zupa", type: "soup", instructions: null },
+        error: null,
+      },
+    ),
     delete: vi.fn().mockReturnThis(),
     eq: vi.fn().mockResolvedValue({ error: null }),
   };
@@ -131,13 +137,16 @@ describe("POST /api/recipes", () => {
   });
 
   it("persists recipe, ingredients, photo, and a success attempt log on a successful extraction", async () => {
-    const client = mockSupabaseClient({ recipeInsert: { data: { id: "recipe-1", name: "Zupa", type: "soup" } } });
+    const client = mockSupabaseClient({
+      recipeInsert: { data: { id: "recipe-1", name: "Zupa", type: "soup", instructions: "Ugotuj warzywa." } },
+    });
     vi.mocked(createClient).mockReturnValue(client as never);
     vi.mocked(extractRecipeFromPhoto).mockResolvedValue({
       success: true,
       name: "Zupa",
       type: "soup",
       ingredients: ["marchew", "cebula"],
+      instructions: "Ugotuj warzywa.",
       raw: {},
     });
 
@@ -147,12 +156,18 @@ describe("POST /api/recipes", () => {
     expect(response.status).toBe(200);
     expect(body).toEqual({
       success: true,
-      recipe: { id: "recipe-1", name: "Zupa", type: "soup", ingredients: ["marchew", "cebula"] },
+      recipe: {
+        id: "recipe-1",
+        name: "Zupa",
+        type: "soup",
+        ingredients: ["marchew", "cebula"],
+        instructions: "Ugotuj warzywa.",
+      },
       typeUnconfirmed: false,
     });
     expect(client.upload).toHaveBeenCalledOnce();
     expect(client.recipesChain.insert).toHaveBeenCalledWith(
-      expect.objectContaining({ user_id: "user-1", name: "Zupa", type: "soup" }),
+      expect.objectContaining({ user_id: "user-1", name: "Zupa", type: "soup", instructions: "Ugotuj warzywa." }),
     );
     expect(client.ingredientsChain.insert).toHaveBeenCalledWith([
       { recipe_id: "recipe-1", name: "marchew", position: 0 },
@@ -171,6 +186,7 @@ describe("POST /api/recipes", () => {
       name: "Coś",
       type: null,
       ingredients: ["składnik"],
+      instructions: null,
       raw: {},
     });
 
@@ -189,6 +205,7 @@ describe("POST /api/recipes", () => {
       name: "Zupa",
       type: "soup",
       ingredients: ["marchew"],
+      instructions: null,
       raw: {},
     });
 
@@ -227,6 +244,7 @@ describe("POST /api/recipes", () => {
       name: "Zupa",
       type: "soup",
       ingredients: ["marchew"],
+      instructions: null,
       raw: {},
     });
 

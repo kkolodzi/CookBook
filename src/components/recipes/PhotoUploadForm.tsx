@@ -142,6 +142,13 @@ export default function PhotoUploadForm() {
           <p className="font-medium">Przepis zapisany!</p>
         </div>
         <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+          {filePreviewUrl && (
+            <img
+              src={filePreviewUrl}
+              alt={successData.recipe.name}
+              className="mb-3 max-h-64 w-full rounded-lg object-contain"
+            />
+          )}
           <p className="text-lg font-semibold">{successData.recipe.name}</p>
           <p className="text-sm text-blue-100/70">{RECIPE_TYPE_LABELS[successData.recipe.type]}</p>
           <ul className="mt-3 list-inside list-disc space-y-1 text-sm text-blue-100/80">

@@ -62,4 +62,4 @@ unconfirmed-type case the user can sit on the success screen for a while picking
 - **Fix**: Render the same preview `<img src={filePreviewUrl} ...>` (or an equivalent block) in
   the success card too, above or alongside the recipe name — reusing the already-available
   `filePreviewUrl` state, no new data plumbing needed.
-- **Decision**: PENDING
+- **Decision**: FIXED — preview now also rendered in the success card, reusing `filePreviewUrl`.

@@ -438,8 +438,8 @@ None — no schema or data changes in this plan.
 
 #### Automated
 
-- [x] 1.1 npm run build succeeds
-- [x] 1.2 npm run lint passes
+- [x] 1.1 npm run build succeeds — 82f8cbf
+- [x] 1.2 npm run lint passes — 82f8cbf
 
 #### Manual
 
@@ -450,8 +450,8 @@ None — no schema or data changes in this plan.
 
 #### Automated
 
-- [ ] 2.1 npm run build succeeds
-- [ ] 2.2 npm run lint passes
+- [x] 2.1 npm run build succeeds
+- [x] 2.2 npm run lint passes
 
 #### Manual
 

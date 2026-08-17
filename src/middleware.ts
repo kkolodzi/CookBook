@@ -1,7 +1,7 @@
 import { defineMiddleware } from "astro:middleware";
 import { createClient } from "@/lib/supabase";
 
-const PROTECTED_ROUTES = ["/dashboard", "/recipes"];
+const PROTECTED_ROUTES = ["/recipes"];
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const supabase = createClient(context.request.headers, context.cookies);
@@ -19,6 +19,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
     if (!context.locals.user) {
       return context.redirect("/auth/signin");
     }
+  }
+
+  if (context.url.pathname === "/" && context.locals.user) {
+    return context.redirect("/recipes");
   }
 
   return next();

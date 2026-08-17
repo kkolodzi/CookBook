@@ -10,6 +10,13 @@ import type { ExtractionFailureReason } from "@/lib/services/recipe-extraction";
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 const ACCEPTED_MIME_TYPES = ["image/jpeg", "image/png"];
 const GENERIC_ERROR_MESSAGE = "Nie udało się zapisać przepisu. Spróbuj ponownie.";
+const REDIRECT_DELAY_MS = 2000;
+
+function redirectToRecipes() {
+  window.setTimeout(() => {
+    window.location.href = "/recipes";
+  }, REDIRECT_DELAY_MS);
+}
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -86,6 +93,9 @@ export default function PhotoUploadForm() {
       if ("success" in body && body.success) {
         setSuccessData({ recipe: body.recipe, typeUnconfirmed: body.typeUnconfirmed });
         setStatus("success");
+        if (!body.typeUnconfirmed) {
+          redirectToRecipes();
+        }
         return;
       }
 
@@ -150,6 +160,7 @@ export default function PhotoUploadForm() {
             recipeId={successData.recipe.id}
             onConfirmed={(type) => {
               setSuccessData((prev) => (prev ? { recipe: { ...prev.recipe, type }, typeUnconfirmed: false } : prev));
+              redirectToRecipes();
             }}
           />
         )}

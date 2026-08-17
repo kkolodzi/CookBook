@@ -1,9 +1,9 @@
 ---
 change_id: recipe-prep-instructions
 title: Capture recipe preparation instructions/steps
-status: planned
+status: implementing
 created: 2026-08-16
-updated: 2026-08-16
+updated: 2026-08-17
 archived_at: null
 ---
 

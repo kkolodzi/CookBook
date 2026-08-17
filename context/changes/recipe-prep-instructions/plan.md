@@ -531,10 +531,10 @@ Phase 7.
 
 #### Automated
 
-- [ ] 1.1 supabase link (dev) succeeds
-- [ ] 1.2 supabase db push applies migration
-- [ ] 1.3 npm run build succeeds
-- [ ] 1.4 npm run lint passes
+- [x] 1.1 supabase link (dev) succeeds
+- [x] 1.2 supabase db push applies migration
+- [x] 1.3 npm run build succeeds
+- [x] 1.4 npm run lint passes
 
 #### Manual
 

@@ -101,6 +101,7 @@ export type Database = {
           created_at: string;
           deleted_at: string | null;
           id: string;
+          instructions: string | null;
           name: string;
           photo_path: string;
           type: Database["public"]["Enums"]["recipe_type"];
@@ -111,6 +112,7 @@ export type Database = {
           created_at?: string;
           deleted_at?: string | null;
           id?: string;
+          instructions?: string | null;
           name: string;
           photo_path: string;
           type: Database["public"]["Enums"]["recipe_type"];
@@ -121,6 +123,7 @@ export type Database = {
           created_at?: string;
           deleted_at?: string | null;
           id?: string;
+          instructions?: string | null;
           name?: string;
           photo_path?: string;
           type?: Database["public"]["Enums"]["recipe_type"];

@@ -34,7 +34,7 @@ Home cooks save recipes on social media but can't find them at meal time — the
 | S-01 | photo-to-recipe-save     | upload a photo, get an AI-extracted recipe saved to collection  | F-01, F-02     | FR-004, FR-005, FR-008, US-01          | done |
 | S-02 | recipe-search-and-browse | search recipes by ingredient, filter by type, view details       | S-01           | FR-013, FR-015, FR-016, FR-018, US-02  | done |
 | S-03 | recipe-edit-and-remove   | edit a saved recipe and remove it reversibly                     | S-01           | FR-019, FR-020                         | done |
-| S-04 | recipe-prep-instructions | see a recipe's preparation instructions, extracted from the photo | S-01           | FR-021, FR-018, FR-019                 | in-progress |
+| S-04 | recipe-prep-instructions | see a recipe's preparation instructions, extracted from the photo | S-01           | FR-021, FR-018, FR-019                 | done |
 
 ## Streams
 
@@ -136,7 +136,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Can the vision API reliably transcribe multi-line Polish preparation instructions from handwritten/printed recipes, at the same quality bar validated for ingredients during S-01? — Owner: builder, validate during implementation. Block: no — extraction is best-effort/nullable by design (see FR-021), so a quality shortfall degrades gracefully rather than blocking.
 - **Risk:** Low technical risk — additive `instructions text` column, one extra `edit_recipe()` RPC parameter (kept additive via `default null`), matching UI patterns in three existing components. No remaining sequencing risk.
-- **Status:** in-progress — `/10x-implement recipe-prep-instructions phase 1` started 2026-08-17. See `context/changes/recipe-prep-instructions/plan-brief.md`.
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -259,3 +259,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **S-01: user can upload a photo of a physical recipe from their gallery; the app extracts the recipe name, ingredient list, and type via an AI vision API and saves the result to their personal collection automatically, with clear visible feedback on success or failure.** — Archived 2026-08-16 → `context/archive/2026-08-15-photo-to-recipe-save/`. Lesson: —.
 - **S-02: user can browse the full recipe collection with an empty search, search by ingredient (e.g. "marchewka"), filter by meal type, and view a recipe's full details — name, ingredient list, type, photo, and note.** — Archived 2026-08-16 → `context/archive/2026-08-16-recipe-search-and-browse/`. Lesson: —.
 - **S-03: user can edit a saved recipe's name, ingredient list, type, or note, and can remove a recipe from their collection with the ability to recover it within a defined window.** — Archived 2026-08-16 → `context/archive/2026-08-16-recipe-edit-and-remove/`. Lesson: —.
+- **S-04: user's saved recipe includes preparation instructions extracted from the photo as freeform text; visible in the recipe detail view and editable, same as name/ingredients/type/note today.** — Archived 2026-08-17 → `context/archive/2026-08-16-recipe-prep-instructions/`. Lesson: —.

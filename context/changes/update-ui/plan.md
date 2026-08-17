@@ -443,8 +443,8 @@ None — no schema or data changes in this plan.
 
 #### Manual
 
-- [ ] 1.3 Landing page reads as SnapRecipe, not the Astro starter kit
-- [ ] 1.4 Browser tab title reads "SnapRecipe" by default
+- [x] 1.3 Landing page reads as SnapRecipe, not the Astro starter kit
+- [x] 1.4 Browser tab title reads "SnapRecipe" by default
 
 ### Phase 2: Root redirect + dashboard removal
 
@@ -455,9 +455,9 @@ None — no schema or data changes in this plan.
 
 #### Manual
 
-- [ ] 2.3 Logged-in visit to / redirects to /recipes
-- [ ] 2.4 /dashboard 404s
-- [ ] 2.5 Logged-out visit to /recipes still redirects to /auth/signin
+- [x] 2.3 Logged-in visit to / redirects to /recipes
+- [x] 2.4 /dashboard 404s
+- [x] 2.5 Logged-out visit to /recipes still redirects to /auth/signin
 
 ### Phase 3: Shared header on recipe pages
 
@@ -468,8 +468,8 @@ None — no schema or data changes in this plan.
 
 #### Manual
 
-- [ ] 3.3 Header (name + email + sign out) visible and working on all four recipe pages
-- [ ] 3.4 Existing contextual back-links/actions on each page still work
+- [x] 3.3 Header (name + email + sign out) visible and working on all four recipe pages
+- [x] 3.4 Existing contextual back-links/actions on each page still work
 
 ### Phase 4: Photo thumbnail on upload confirmation
 
@@ -481,7 +481,7 @@ None — no schema or data changes in this plan.
 
 #### Manual
 
-- [ ] 4.4 Post-upload confirmation card shows the uploaded photo's thumbnail
+- [x] 4.4 Post-upload confirmation card shows the uploaded photo's thumbnail
 
 ### Phase 5: Auto-redirect after upload (fixes stale list)
 
@@ -492,6 +492,6 @@ None — no schema or data changes in this plan.
 
 #### Manual
 
-- [ ] 5.3 Confidently-typed upload auto-redirects to /recipes showing the new recipe
-- [ ] 5.4 Unconfirmed-type upload does not auto-redirect until type is picked, then redirects
-- [ ] 5.5 Navigating to /recipes via header or Back button shows the new recipe (no staleness)
+- [x] 5.3 Confidently-typed upload auto-redirects to /recipes showing the new recipe
+- [x] 5.4 Unconfirmed-type upload does not auto-redirect until type is picked, then redirects
+- [x] 5.5 Navigating to /recipes via header or Back button shows the new recipe (no staleness)

@@ -584,11 +584,11 @@ Phase 7.
 
 #### Automated
 
-- [x] 6.1 supabase link (dev) succeeds
-- [x] 6.2 supabase db push applies migration
-- [x] 6.3 npm run test passes ([id]/index.test.ts)
-- [x] 6.4 npm run lint passes
-- [x] 6.5 npm run build succeeds
+- [x] 6.1 supabase link (dev) succeeds — 49c3d15
+- [x] 6.2 supabase db push applies migration — 49c3d15
+- [x] 6.3 npm run test passes ([id]/index.test.ts) — 49c3d15
+- [x] 6.4 npm run lint passes — 49c3d15
+- [x] 6.5 npm run build succeeds — 49c3d15
 
 #### Manual
 
@@ -600,10 +600,10 @@ Phase 7.
 
 #### Automated
 
-- [ ] 7.1 supabase link (prod) succeeds
-- [ ] 7.2 supabase db push applies both migrations to production
-- [ ] 7.3 npm run build succeeds
-- [ ] 7.4 npm run lint passes
+- [x] 7.1 supabase link (prod) succeeds
+- [x] 7.2 supabase db push applies both migrations to production
+- [x] 7.3 npm run build succeeds
+- [x] 7.4 npm run lint passes
 
 #### Manual
 

@@ -1,10 +1,10 @@
 ---
 change_id: update-ui
 title: Update ui
-status: impl_reviewed
+status: archived
 created: 2026-08-17
 updated: 2026-08-17
-archived_at: null
+archived_at: 2026-08-17T13:46:58Z
 ---
 
 ## Notes

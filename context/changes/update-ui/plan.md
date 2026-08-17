@@ -487,8 +487,8 @@ None — no schema or data changes in this plan.
 
 #### Automated
 
-- [x] 5.1 npm run build succeeds
-- [x] 5.2 npm run lint passes
+- [x] 5.1 npm run build succeeds — ebb4ec3
+- [x] 5.2 npm run lint passes — ebb4ec3
 
 #### Manual
 

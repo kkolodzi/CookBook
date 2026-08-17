@@ -21,3 +21,18 @@ Bundles four UI items:
 4. Post-login destination should be the recipe list, not the placeholder `/dashboard`
    "select action" screen — and that destination needs a logout affordance since `/dashboard`
    currently hosts sign-out.
+
+**Post-implementation correction (2026-08-17)**, after manual testing of all 5 phases: two fixes,
+rest confirmed OK.
+- Topbar rendered at a different width per page (it inherited whatever container it was nested
+  in — 4xl on the list, 2xl on detail, unconstrained on new/edit). Fixed: Topbar now owns its own
+  `mx-auto max-w-4xl`, and is rendered as a sibling before each page's content wrapper instead of
+  nested inside it, so its width is constant everywhere.
+- Photo feedback was reconsidered: instead of a small thumbnail in the post-upload confirmation
+  card (gone within ~2s once Phase 5's auto-redirect fires), show a normal-sized local preview
+  immediately when the file is picked — visible through the whole idle → loading → success flow,
+  not just briefly at the end. `PhotoUploadForm` now creates an object URL from the selected
+  `File` on selection (revoked on replace/reset/unmount) and renders it in place of the upload
+  icon; the post-upload success card's thumbnail block is removed. `POST /api/recipes`'s
+  `photoUrl` response field is left as-is (harmless, matches the project's existing "kept in sync
+  anyway" precedent for unused-but-consistent API fields — see `GET /api/recipes/[id]`).

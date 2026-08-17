@@ -1,5 +1,5 @@
-import React, { useRef, useState } from "react";
-import { ImagePlus, ImageOff, Loader2, CircleCheck, CircleAlert } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { ImagePlus, Loader2, CircleCheck, CircleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { RECIPE_TYPE_LABELS, type RecipeTypeValue } from "@/components/recipes/recipe-type-labels";
@@ -44,29 +44,40 @@ type ApiResponseBody =
 export default function PhotoUploadForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [file, setFile] = useState<File | null>(null);
+  const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<SuccessData | null>(null);
   const [errorInfo, setErrorInfo] = useState<ErrorInfo | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    return () => {
+      if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
+    };
+  }, [filePreviewUrl]);
+
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = e.target.files?.[0] ?? null;
     if (!selected) {
       setFile(null);
+      setFilePreviewUrl(null);
       return;
     }
     if (!ACCEPTED_MIME_TYPES.includes(selected.type)) {
       setFile(null);
+      setFilePreviewUrl(null);
       setFileError("Wybierz zdjęcie w formacie JPEG lub PNG.");
       return;
     }
     if (selected.size > MAX_FILE_SIZE_BYTES) {
       setFile(null);
+      setFilePreviewUrl(null);
       setFileError("Zdjęcie jest za duże — maksymalny rozmiar to 5MB.");
       return;
     }
     setFileError(null);
     setFile(selected);
+    setFilePreviewUrl(URL.createObjectURL(selected));
   }
 
   async function handleSubmit() {
@@ -116,6 +127,7 @@ export default function PhotoUploadForm() {
   function reset() {
     setStatus("idle");
     setFile(null);
+    setFilePreviewUrl(null);
     setFileError(null);
     setSuccessData(null);
     setErrorInfo(null);
@@ -130,17 +142,6 @@ export default function PhotoUploadForm() {
           <p className="font-medium">Przepis zapisany!</p>
         </div>
         <div className="rounded-lg border border-white/10 bg-white/5 p-4">
-          <div className="mb-3 flex aspect-video items-center justify-center overflow-hidden rounded-md bg-black/20">
-            {successData.recipe.photoUrl ? (
-              <img
-                src={successData.recipe.photoUrl}
-                alt={successData.recipe.name}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <ImageOff className="size-8 text-white/30" />
-            )}
-          </div>
           <p className="text-lg font-semibold">{successData.recipe.name}</p>
           <p className="text-sm text-blue-100/70">{RECIPE_TYPE_LABELS[successData.recipe.type]}</p>
           <ul className="mt-3 list-inside list-disc space-y-1 text-sm text-blue-100/80">
@@ -201,7 +202,11 @@ export default function PhotoUploadForm() {
           status === "loading" && "pointer-events-none opacity-60",
         )}
       >
-        <ImagePlus className="size-10 text-white/50" />
+        {filePreviewUrl ? (
+          <img src={filePreviewUrl} alt={file?.name} className="max-h-64 w-full rounded-lg object-contain" />
+        ) : (
+          <ImagePlus className="size-10 text-white/50" />
+        )}
         <span className="text-sm text-blue-100/70">{file ? file.name : "Wybierz zdjęcie przepisu"}</span>
         <input
           ref={inputRef}

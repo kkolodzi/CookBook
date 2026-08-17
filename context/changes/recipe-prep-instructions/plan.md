@@ -600,10 +600,10 @@ Phase 7.
 
 #### Automated
 
-- [x] 7.1 supabase link (prod) succeeds
-- [x] 7.2 supabase db push applies both migrations to production
-- [x] 7.3 npm run build succeeds
-- [x] 7.4 npm run lint passes
+- [x] 7.1 supabase link (prod) succeeds — d0fbf02
+- [x] 7.2 supabase db push applies both migrations to production — d0fbf02
+- [x] 7.3 npm run build succeeds — d0fbf02
+- [x] 7.4 npm run lint passes — d0fbf02
 
 #### Manual
 

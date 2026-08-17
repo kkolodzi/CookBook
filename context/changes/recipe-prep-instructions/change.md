@@ -1,7 +1,7 @@
 ---
 change_id: recipe-prep-instructions
 title: Capture recipe preparation instructions/steps
-status: implemented
+status: impl_reviewed
 created: 2026-08-16
 updated: 2026-08-17
 archived_at: null
@@ -42,5 +42,8 @@ collision with S-03's own `20260816170000_atomic_recipe_ingredient_edit.sql`.
 migration backlog was found to be far behind (missing all of S-01/S-02/S-03's post-schema
 migrations) and was fully caught up as part of Phase 7. Manual verification confirmed by the user
 2026-08-17.
+
+**Reviewed 2026-08-17** — `/10x-impl-review` full-plan review: APPROVED, 0 critical, 0 warnings,
+2 benign observations. See `reviews/impl-review.md`.
 
 Next step: `/10x-archive recipe-prep-instructions`.

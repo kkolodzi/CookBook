@@ -1,17 +1,21 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import Topbar from "@/components/Topbar.astro";
 import PhotoUploadForm from "@/components/recipes/PhotoUploadForm";
 ---
 
 <Layout title="Dodaj przepis ze zdjęcia">
-  <div class="bg-cosmic flex min-h-screen items-center justify-center p-4">
-    <div class="w-full max-w-sm rounded-2xl border border-white/10 bg-white/10 p-8 backdrop-blur-xl">
-      <h1
-        class="mb-6 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-center text-2xl font-bold text-transparent"
-      >
-        Dodaj przepis ze zdjęcia
-      </h1>
-      <PhotoUploadForm client:load />
+  <div class="bg-cosmic flex min-h-screen flex-col p-4">
+    <Topbar />
+    <div class="flex flex-1 items-center justify-center">
+      <div class="w-full max-w-sm rounded-2xl border border-white/10 bg-white/10 p-8 backdrop-blur-xl">
+        <h1
+          class="mb-6 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-center text-2xl font-bold text-transparent"
+        >
+          Dodaj przepis ze zdjęcia
+        </h1>
+        <PhotoUploadForm client:load />
+      </div>
     </div>
   </div>
 </Layout>

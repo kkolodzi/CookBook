@@ -1,5 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import Topbar from "@/components/Topbar.astro";
 import RecipeEditForm from "@/components/recipes/RecipeEditForm";
 import { createClient } from "@/lib/supabase";
 import type { RecipeTypeValue } from "@/components/recipes/recipe-type-labels";
@@ -49,33 +50,36 @@ if (!recipe && !loadError) {
 ---
 
 <Layout title={recipe ? `Edytuj: ${recipe.name}` : "Nie znaleziono przepisu"}>
-  <div class="bg-cosmic flex min-h-screen items-center justify-center p-4">
-    <div class="w-full max-w-lg rounded-2xl border border-white/10 bg-white/10 p-8 backdrop-blur-xl">
-      {
-        loadError ? (
-          <p class="text-sm text-red-300">{loadError}</p>
-        ) : !recipe ? (
-          <div class="space-y-4 text-center text-white">
-            <p>Nie znaleziono przepisu.</p>
-            <a href="/recipes" class="text-sm text-blue-100/70 underline hover:text-white">
-              ← Wróć do listy przepisów
-            </a>
-          </div>
-        ) : (
-          <>
-            <h1 class="mb-6 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
-              Edytuj przepis
-            </h1>
-            <RecipeEditForm client:load recipe={recipe} />
-            <a
-              href={`/recipes/${recipe.id}`}
-              class="mt-6 inline-block text-sm text-blue-100/70 underline hover:text-white"
-            >
-              ← Wróć do przepisu
-            </a>
-          </>
-        )
-      }
+  <div class="bg-cosmic flex min-h-screen flex-col p-4">
+    <Topbar />
+    <div class="flex flex-1 items-center justify-center">
+      <div class="w-full max-w-lg rounded-2xl border border-white/10 bg-white/10 p-8 backdrop-blur-xl">
+        {
+          loadError ? (
+            <p class="text-sm text-red-300">{loadError}</p>
+          ) : !recipe ? (
+            <div class="space-y-4 text-center text-white">
+              <p>Nie znaleziono przepisu.</p>
+              <a href="/recipes" class="text-sm text-blue-100/70 underline hover:text-white">
+                ← Wróć do listy przepisów
+              </a>
+            </div>
+          ) : (
+            <>
+              <h1 class="mb-6 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
+                Edytuj przepis
+              </h1>
+              <RecipeEditForm client:load recipe={recipe} />
+              <a
+                href={`/recipes/${recipe.id}`}
+                class="mt-6 inline-block text-sm text-blue-100/70 underline hover:text-white"
+              >
+                ← Wróć do przepisu
+              </a>
+            </>
+          )
+        }
+      </div>
     </div>
   </div>
 </Layout>

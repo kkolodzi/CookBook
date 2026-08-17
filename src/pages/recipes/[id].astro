@@ -1,5 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import Topbar from "@/components/Topbar.astro";
 import { createClient } from "@/lib/supabase";
 import { getRecipeDetail } from "@/lib/services/recipe-query";
 import { RECIPE_TYPE_LABELS } from "@/components/recipes/recipe-type-labels";
@@ -33,6 +34,7 @@ Astro.response.status = status;
 <Layout title={recipe?.name ?? "Nie znaleziono przepisu"}>
   <div class="bg-cosmic min-h-screen p-4">
     <div class="mx-auto max-w-2xl">
+      <Topbar />
       <a href="/recipes" class="mb-4 inline-block text-sm text-blue-100/70 hover:text-white">← Twoje przepisy</a>
       {
         !recipe ? (

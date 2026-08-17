@@ -98,7 +98,7 @@ export async function getRecipeDetail(
 ): Promise<RecipeDetailDto | null> {
   const { data: recipe, error: recipeError } = await supabase
     .from("recipes")
-    .select("id, name, type, photo_path, created_at")
+    .select("id, name, type, photo_path, created_at, instructions")
     .eq("id", recipeId)
     .eq("user_id", userId)
     .is("deleted_at", null)
@@ -139,5 +139,6 @@ export async function getRecipeDetail(
     createdAt: recipe.created_at,
     photoUrl,
     ingredients,
+    instructions: recipe.instructions,
   };
 }

@@ -168,6 +168,7 @@ const sampleRecipeRow = {
   type: "soup",
   photo_path: "user-1/recipe-1.jpg",
   created_at: "2026-08-16T00:00:00.000Z",
+  instructions: "Ugotuj pomidory z cebulą, zmiksuj i dopraw.",
 };
 
 describe("getRecipeDetail", () => {
@@ -222,6 +223,7 @@ describe("getRecipeDetail", () => {
         { id: "ing-1", name: "pomidory", position: 0 },
         { id: "ing-2", name: "cebula", position: 1 },
       ],
+      instructions: "Ugotuj pomidory z cebulą, zmiksuj i dopraw.",
     });
   });
 

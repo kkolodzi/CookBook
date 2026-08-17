@@ -74,6 +74,12 @@ Astro.response.status = status;
                   ))}
                 </ul>
               </div>
+              {recipe.instructions && (
+                <div>
+                  <h2 class="text-sm font-semibold text-blue-100/70">Instrukcje przygotowania</h2>
+                  <p class="mt-2 text-sm whitespace-pre-line text-blue-100/90">{recipe.instructions}</p>
+                </div>
+              )}
             </div>
           </div>
         )

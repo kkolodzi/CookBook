@@ -316,4 +316,5 @@ export interface RecipeDetailDto {
   createdAt: string;
   photoUrl: string | null;
   ingredients: RecipeIngredientDto[];
+  instructions: string | null;
 }

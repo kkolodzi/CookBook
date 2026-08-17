@@ -538,7 +538,7 @@ Phase 7.
 
 #### Manual
 
-- [ ] 1.5 Confirm new column in dev via Studio
+- [x] 1.5 Confirm new column in dev via Studio
 
 ### Phase 2: Extraction service
 
@@ -565,8 +565,8 @@ Phase 7.
 
 #### Manual
 
-- [ ] 4.3 Upload photo with visible steps; confirm prose renders
-- [ ] 4.4 Upload photo without visible steps; confirm graceful omission
+- [x] 4.3 Upload photo with visible steps; confirm prose renders
+- [x] 4.4 Upload photo without visible steps; confirm graceful omission
 
 ### Phase 5: Detail view (FR-018)
 
@@ -577,8 +577,8 @@ Phase 7.
 
 #### Manual
 
-- [ ] 5.3 Detail view shows instructions when present
-- [ ] 5.4 Detail view omits the section when instructions is null
+- [x] 5.3 Detail view shows instructions when present
+- [x] 5.4 Detail view omits the section when instructions is null
 
 ### Phase 6: Edit form (FR-019)
 
@@ -592,9 +592,9 @@ Phase 7.
 
 #### Manual
 
-- [ ] 6.6 Add instructions via edit form; detail view reflects it
-- [ ] 6.7 Change existing instructions via edit form; detail view reflects it
-- [ ] 6.8 Clear instructions via edit form; detail view shows no section
+- [x] 6.6 Add instructions via edit form; detail view reflects it
+- [x] 6.7 Change existing instructions via edit form; detail view reflects it
+- [x] 6.8 Clear instructions via edit form; detail view shows no section
 
 ### Phase 7: Production rollout
 
@@ -607,5 +607,5 @@ Phase 7.
 
 #### Manual
 
-- [ ] 7.5 Existing production recipe unaffected (detail + edit load fine, instructions absent)
-- [ ] 7.6 Full regression: upload → confirmation → detail view → edit → detail view reflects edit
+- [x] 7.5 Existing production recipe unaffected (detail + edit load fine, instructions absent)
+- [x] 7.6 Full regression: upload → confirmation → detail view → edit → detail view reflects edit

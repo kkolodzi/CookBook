@@ -1,7 +1,7 @@
 ---
 change_id: recipe-prep-instructions
 title: Capture recipe preparation instructions/steps
-status: implementing
+status: implemented
 created: 2026-08-16
 updated: 2026-08-17
 archived_at: null
@@ -35,4 +35,12 @@ extends S-03's `edit_recipe()` RPC), and Phase 7 (production rollout for both mi
 Migration filename bumped to `20260816180000_add_recipe_instructions.sql` to avoid a timestamp
 collision with S-03's own `20260816170000_atomic_recipe_ingredient_edit.sql`.
 
-Next step: `/10x-implement recipe-prep-instructions phase 1`.
+**Implemented 2026-08-17** — All 7 phases shipped: schema + extraction service + API persistence
++ upload confirmation UI + detail view + edit form + production rollout. Both migrations
+(`20260816180000_add_recipe_instructions.sql`,
+`20260816190000_edit_recipe_instructions.sql`) applied to dev and prod; along the way, prod's
+migration backlog was found to be far behind (missing all of S-01/S-02/S-03's post-schema
+migrations) and was fully caught up as part of Phase 7. Manual verification confirmed by the user
+2026-08-17.
+
+Next step: `/10x-archive recipe-prep-instructions`.

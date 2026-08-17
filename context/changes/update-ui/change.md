@@ -1,7 +1,7 @@
 ---
 change_id: update-ui
 title: Update ui
-status: implementing
+status: implemented
 created: 2026-08-17
 updated: 2026-08-17
 archived_at: null
@@ -36,3 +36,12 @@ rest confirmed OK.
   icon; the post-upload success card's thumbnail block is removed. `POST /api/recipes`'s
   `photoUrl` response field is left as-is (harmless, matches the project's existing "kept in sync
   anyway" precedent for unused-but-consistent API fields — see `GET /api/recipes/[id]`).
+- Follow-up: Topbar was still narrower than other pages on `/recipes/new` after the first fix —
+  root cause was relying on flexbox's implicit stretch to reach full width before `max-w-4xl`
+  clamped it, which didn't hold reliably on the flex-col pages (`new.astro`, `edit.astro`).
+  Added `w-full` to make the stretch explicit. Confirmed matching by the user afterward.
+
+**Implemented 2026-08-17** — All 5 phases shipped and manually verified, including two
+post-implementation correction rounds above. No database changes anywhere in this change.
+
+Next step: `/10x-archive update-ui`.

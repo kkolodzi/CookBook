@@ -82,7 +82,7 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
 }
 
 function meetsFloor(name: string | null, ingredients: string[]): name is string {
-  return Boolean(name && name.trim().length > 0 && ingredients.length >= 1);
+  return Boolean(name && name.trim().length > 0 && ingredients.some((i) => i.trim().length > 0));
 }
 
 export async function extractRecipeFromPhoto(imageBytes: ArrayBuffer, mimeType: string): Promise<ExtractionResult> {

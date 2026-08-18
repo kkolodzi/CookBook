@@ -88,6 +88,61 @@ describe("extractRecipeFromPhoto", () => {
     expect(result).toEqual({ success: false, reason: "incomplete_extraction", raw: modelPayload });
   });
 
+  it("downgrades a response whose ingredients are all blank strings to incomplete_extraction", async () => {
+    const modelPayload = {
+      is_recipe: true,
+      not_recipe_reason: null,
+      name: "Nieznana zupa",
+      type: null,
+      ingredients: ["", "   "],
+      instructions: null,
+    };
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(mockFetchResponse(chatCompletion(modelPayload))));
+
+    const result = await extractRecipeFromPhoto(imageBytes, "image/jpeg");
+
+    expect(result).toEqual({ success: false, reason: "incomplete_extraction", raw: modelPayload });
+  });
+
+  it("passes through a partial-blank ingredients array unfiltered as a success", async () => {
+    const modelPayload = {
+      is_recipe: true,
+      not_recipe_reason: null,
+      name: "Nieznana zupa",
+      type: null,
+      ingredients: ["", "mąka"],
+      instructions: null,
+    };
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(mockFetchResponse(chatCompletion(modelPayload))));
+
+    const result = await extractRecipeFromPhoto(imageBytes, "image/jpeg");
+
+    expect(result).toEqual({
+      success: true,
+      name: "Nieznana zupa",
+      type: null,
+      ingredients: ["", "mąka"],
+      instructions: null,
+      raw: modelPayload,
+    });
+  });
+
+  it("maps a structurally wrong-shaped ingredients field to technical_error", async () => {
+    const parsedContent = {
+      is_recipe: true,
+      not_recipe_reason: null,
+      name: "Zupa",
+      type: "soup",
+      ingredients: "not-an-array",
+      instructions: null,
+    };
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(mockFetchResponse(chatCompletion(parsedContent))));
+
+    const result = await extractRecipeFromPhoto(imageBytes, "image/jpeg");
+
+    expect(result).toEqual({ success: false, reason: "technical_error", raw: parsedContent });
+  });
+
   it("maps malformed JSON content to technical_error", async () => {
     vi.stubGlobal(
       "fetch",

@@ -139,7 +139,10 @@ export const POST: APIRoute = async (context) => {
     return jsonResponse({ error: "Wystąpił błąd podczas zapisu przepisu. Spróbuj ponownie." }, 500);
   }
 
-  const ingredientRows = result.ingredients.map((name, position) => ({
+  const filteredIngredients = result.ingredients.map((i) => i.trim()).filter((i) => i.length > 0);
+  const contentDegraded = filteredIngredients.length < result.ingredients.length || result.instructions === null;
+
+  const ingredientRows = filteredIngredients.map((name, position) => ({
     recipe_id: recipeRow.id,
     name,
     position,
@@ -179,11 +182,12 @@ export const POST: APIRoute = async (context) => {
         id: recipeRow.id,
         name: recipeRow.name,
         type: recipeRow.type,
-        ingredients: result.ingredients,
+        ingredients: filteredIngredients,
         instructions: recipeRow.instructions,
         photoUrl: signedPhoto?.signedUrl ?? null,
       },
       typeUnconfirmed: result.type === null,
+      contentDegraded,
     },
     200,
   );

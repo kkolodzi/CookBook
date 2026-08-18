@@ -554,15 +554,15 @@ schema change.
 
 #### Automated
 
-- [x] 1.1 Unit tests pass: `npm run test`
-- [x] 1.2 Lint (type-checked) passes: `npm run lint`
+- [x] 1.1 Unit tests pass: `npm run test` — 908e1bb
+- [x] 1.2 Lint (type-checked) passes: `npm run lint` — 908e1bb
 
 ### Phase 2: Persistence-layer filtering + contentDegraded
 
 #### Automated
 
-- [ ] 2.1 Unit tests pass: `npm run test`
-- [ ] 2.2 Lint (type-checked) passes: `npm run lint`
+- [x] 2.1 Unit tests pass: `npm run test`
+- [x] 2.2 Lint (type-checked) passes: `npm run lint`
 
 ### Phase 3: Component-test tooling foundation
 

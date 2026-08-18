@@ -189,6 +189,7 @@ describe("POST /api/recipes", () => {
         photoUrl: "https://signed.example/photo.jpg",
       },
       typeUnconfirmed: false,
+      contentDegraded: false,
     });
     expect(client.upload).toHaveBeenCalledOnce();
     expect(client.recipesChain.insert).toHaveBeenCalledWith(
@@ -201,6 +202,53 @@ describe("POST /api/recipes", () => {
     expect(client.extractionAttemptsChain.insert).toHaveBeenCalledWith(
       expect.objectContaining({ success: true, recipe_id: "recipe-1" }),
     );
+  });
+
+  it("filters blank ingredient strings before insert and flags contentDegraded", async () => {
+    const client = mockSupabaseClient({
+      recipeInsert: { data: { id: "recipe-4", name: "Zupa", type: "soup", instructions: "Ugotuj warzywa." } },
+    });
+    vi.mocked(createClient).mockReturnValue(client as never);
+    vi.mocked(extractRecipeFromPhoto).mockResolvedValue({
+      success: true,
+      name: "Zupa",
+      type: "soup",
+      ingredients: ["", "marchew", " "],
+      instructions: "Ugotuj warzywa.",
+      raw: {},
+    });
+
+    const response = await POST(makeContext({ formData: photoFormData(samplePhoto()) }));
+    const body = (await response.json()) as {
+      recipe: { ingredients: string[] };
+      contentDegraded: boolean;
+    };
+
+    expect(client.ingredientsChain.insert).toHaveBeenCalledWith([
+      { recipe_id: "recipe-4", name: "marchew", position: 0 },
+    ]);
+    expect(body.recipe.ingredients).toEqual(["marchew"]);
+    expect(body.contentDegraded).toBe(true);
+  });
+
+  it("flags contentDegraded when instructions are missing even with clean ingredients", async () => {
+    const client = mockSupabaseClient({
+      recipeInsert: { data: { id: "recipe-5", name: "Zupa", type: "soup", instructions: null } },
+    });
+    vi.mocked(createClient).mockReturnValue(client as never);
+    vi.mocked(extractRecipeFromPhoto).mockResolvedValue({
+      success: true,
+      name: "Zupa",
+      type: "soup",
+      ingredients: ["marchew", "cebula"],
+      instructions: null,
+      raw: {},
+    });
+
+    const response = await POST(makeContext({ formData: photoFormData(samplePhoto()) }));
+    const body = (await response.json()) as { contentDegraded: boolean };
+
+    expect(body.contentDegraded).toBe(true);
   });
 
   it("falls back to 'other' and flags typeUnconfirmed when the model didn't assign a type", async () => {

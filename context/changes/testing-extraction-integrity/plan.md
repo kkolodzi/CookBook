@@ -561,15 +561,15 @@ schema change.
 
 #### Automated
 
-- [x] 2.1 Unit tests pass: `npm run test`
-- [x] 2.2 Lint (type-checked) passes: `npm run lint`
+- [x] 2.1 Unit tests pass: `npm run test` — 427ef03
+- [x] 2.2 Lint (type-checked) passes: `npm run lint` — 427ef03
 
 ### Phase 3: Component-test tooling foundation
 
 #### Automated
 
-- [ ] 3.1 Full suite passes with zero regressions in the two pre-existing test files: `npm run test`
-- [ ] 3.2 Lint passes: `npm run lint`
+- [x] 3.1 Full suite passes with zero regressions in the two pre-existing test files: `npm run test`
+- [x] 3.2 Lint passes: `npm run lint`
 
 ### Phase 4: Upload UI degraded-content notice + component tests
 

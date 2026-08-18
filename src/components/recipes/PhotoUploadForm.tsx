@@ -32,12 +32,13 @@ interface SavedRecipe {
 interface SuccessData {
   recipe: SavedRecipe;
   typeUnconfirmed: boolean;
+  contentDegraded: boolean;
 }
 
 type ErrorInfo = { kind: "reason"; reason: UploadFailureKey } | { kind: "message"; message: string };
 
 type ApiResponseBody =
-  | { success: true; recipe: SavedRecipe; typeUnconfirmed: boolean }
+  | { success: true; recipe: SavedRecipe; typeUnconfirmed: boolean; contentDegraded: boolean }
   | { success: false; reason: ExtractionFailureReason }
   | { error: string };
 
@@ -102,7 +103,11 @@ export default function PhotoUploadForm() {
       }
 
       if ("success" in body && body.success) {
-        setSuccessData({ recipe: body.recipe, typeUnconfirmed: body.typeUnconfirmed });
+        setSuccessData({
+          recipe: body.recipe,
+          typeUnconfirmed: body.typeUnconfirmed,
+          contentDegraded: body.contentDegraded,
+        });
         setStatus("success");
         if (!body.typeUnconfirmed) {
           redirectToRecipes();
@@ -163,11 +168,19 @@ export default function PhotoUploadForm() {
             </div>
           )}
         </div>
+        {successData.contentDegraded && (
+          <div className="rounded-lg border border-yellow-400/30 bg-yellow-900/20 p-3 text-sm text-yellow-200">
+            Nie wszystkie elementy przepisu udało się rozpoznać — sprawdź listę składników i instrukcje, mogą być
+            niepełne.
+          </div>
+        )}
         {successData.typeUnconfirmed && (
           <TypeConfirmationNudge
             recipeId={successData.recipe.id}
             onConfirmed={(type) => {
-              setSuccessData((prev) => (prev ? { recipe: { ...prev.recipe, type }, typeUnconfirmed: false } : prev));
+              setSuccessData((prev) =>
+                prev ? { ...prev, recipe: { ...prev.recipe, type }, typeUnconfirmed: false } : prev,
+              );
               redirectToRecipes();
             }}
           />

@@ -568,20 +568,20 @@ schema change.
 
 #### Automated
 
-- [x] 3.1 Full suite passes with zero regressions in the two pre-existing test files: `npm run test`
-- [x] 3.2 Lint passes: `npm run lint`
+- [x] 3.1 Full suite passes with zero regressions in the two pre-existing test files: `npm run test` — fec9f1e
+- [x] 3.2 Lint passes: `npm run lint` — fec9f1e
 
 ### Phase 4: Upload UI degraded-content notice + component tests
 
 #### Automated
 
-- [ ] 4.1 Component tests pass: `npm run test`
-- [ ] 4.2 Lint passes: `npm run lint`
+- [x] 4.1 Component tests pass: `npm run test`
+- [x] 4.2 Lint passes: `npm run lint`
 
 #### Manual
 
-- [ ] 4.3 Degraded extraction shows the yellow notice in the browser via `npm run dev`
-- [ ] 4.4 Clean extraction shows no notice in the browser
+- [x] 4.3 Degraded extraction shows the yellow notice in the browser via `npm run dev`
+- [x] 4.4 Clean extraction shows no notice in the browser
 
 ### Phase 5: Cookbook update
 

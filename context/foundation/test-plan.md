@@ -124,11 +124,30 @@ the relevant rollout phase ships; before that, the sub-section reads
 
 ### 6.1 Adding a unit test
 
-- TBD — see §3 Phase 1.
+- **Test type**: unit, Vitest, `vi.mock`/`vi.stubGlobal` to isolate external
+  boundaries (e.g. `fetch`, `astro:env/server`) rather than the module under
+  test.
+- **Location convention**: colocated `*.test.ts` next to the module it
+  covers (e.g. `src/lib/services/recipe-extraction.test.ts` next to
+  `recipe-extraction.ts`).
+- **Reference test**: `src/lib/services/recipe-extraction.test.ts`.
+- **Run locally**: `npm run test`.
 
 ### 6.2 Adding a component test
 
-- TBD — see §3 Phase 1.
+- **Test type**: component, Vitest + `@testing-library/react` + jsdom.
+  Render the real component and assert on rendered output (`getByText`,
+  `queryByText`, `findByText`); mock `global.fetch` per test via
+  `vi.stubGlobal`, matching the unit-test convention in §6.1.
+- **Location convention**: colocated `*.test.tsx` next to the component it
+  covers (e.g. `src/components/recipes/PhotoUploadForm.test.tsx` next to
+  `PhotoUploadForm.tsx`).
+- **jsdom is opt-in per file**: the project-wide Vitest `environment` stays
+  `"node"` (`vitest.config.ts`) — every component test file must start with
+  `// @vitest-environment jsdom` as its first line to get a DOM. Omitting
+  the pragma runs the file under Node and RTL's `render` will fail.
+- **Reference test**: `src/components/recipes/PhotoUploadForm.test.tsx`.
+- **Run locally**: `npm run test`.
 
 ### 6.3 Adding an RLS / cross-user integration test
 

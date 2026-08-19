@@ -575,20 +575,20 @@ schema change.
 
 #### Automated
 
-- [x] 4.1 Component tests pass: `npm run test`
-- [x] 4.2 Lint passes: `npm run lint`
+- [x] 4.1 Component tests pass: `npm run test` — 54797c7
+- [x] 4.2 Lint passes: `npm run lint` — 54797c7
 
 #### Manual
 
-- [x] 4.3 Degraded extraction shows the yellow notice in the browser via `npm run dev`
-- [x] 4.4 Clean extraction shows no notice in the browser
+- [x] 4.3 Degraded extraction shows the yellow notice in the browser via `npm run dev` — 54797c7
+- [x] 4.4 Clean extraction shows no notice in the browser — 54797c7
 
 ### Phase 5: Cookbook update
 
 #### Automated
 
-- [ ] 5.1 test-plan.md §6.1 and §6.2 no longer contain TBD placeholders for this phase
+- [x] 5.1 test-plan.md §6.1 and §6.2 no longer contain TBD placeholders for this phase
 
 #### Manual
 
-- [ ] 5.2 §6.1 and §6.2 read as accurate, actionable instructions for the tests this phase added
+- [x] 5.2 §6.1 and §6.2 read as accurate, actionable instructions for the tests this phase added

@@ -487,8 +487,8 @@ never re-validated retroactively; the guard only governs future writes, consiste
 
 #### Automated
 
-- [x] 1.1 `npm run test:integration` passes (harness smoke test) against `SnapRecipe` dev
-- [x] 1.2 `npm run lint` passes on all new files
+- [x] 1.1 `npm run test:integration` passes (harness smoke test) against `SnapRecipe` dev — 2b3b46e
+- [x] 1.2 `npm run lint` passes on all new files — 2b3b46e
 
 #### Manual
 
@@ -499,8 +499,8 @@ never re-validated retroactively; the guard only governs future writes, consiste
 
 #### Automated
 
-- [ ] 2.1 `npm run test:integration` passes, including every case in `cross-user-rls.test.ts`
-- [ ] 2.2 `npm run lint` passes
+- [x] 2.1 `npm run test:integration` passes, including every case in `cross-user-rls.test.ts`
+- [x] 2.2 `npm run lint` passes
 
 #### Manual
 

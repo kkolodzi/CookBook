@@ -499,8 +499,8 @@ never re-validated retroactively; the guard only governs future writes, consiste
 
 #### Automated
 
-- [x] 2.1 `npm run test:integration` passes, including every case in `cross-user-rls.test.ts`
-- [x] 2.2 `npm run lint` passes
+- [x] 2.1 `npm run test:integration` passes, including every case in `cross-user-rls.test.ts` — 0c66381
+- [x] 2.2 `npm run lint` passes — 0c66381
 
 #### Manual
 
@@ -510,10 +510,10 @@ never re-validated retroactively; the guard only governs future writes, consiste
 
 #### Automated
 
-- [ ] 3.1 `supabase link --project-ref xmyeeuyeszvpvrjszohr` succeeds; `supabase db push` exits 0 (dev)
-- [ ] 3.2 `npm run test:integration` passes, including both cases in `photo-path-ownership.test.ts`, against dev
-- [ ] 3.3 `supabase link --project-ref gtrhakzhlammvfifvlyf` succeeds; `supabase db push` exits 0 (prod)
-- [ ] 3.4 `npm run lint` passes
+- [x] 3.1 `supabase link --project-ref xmyeeuyeszvpvrjszohr` succeeds; `supabase db push` exits 0 (dev)
+- [x] 3.2 `npm run test:integration` passes, including both cases in `photo-path-ownership.test.ts`, against dev
+- [x] 3.3 `supabase link --project-ref gtrhakzhlammvfifvlyf` succeeds; `supabase db push` exits 0 (prod)
+- [x] 3.4 `npm run lint` passes
 
 #### Manual
 

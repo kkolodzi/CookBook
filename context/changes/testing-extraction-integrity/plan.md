@@ -587,8 +587,8 @@ schema change.
 
 #### Automated
 
-- [x] 5.1 test-plan.md §6.1 and §6.2 no longer contain TBD placeholders for this phase
+- [x] 5.1 test-plan.md §6.1 and §6.2 no longer contain TBD placeholders for this phase — a492cca
 
 #### Manual
 
-- [x] 5.2 §6.1 and §6.2 read as accurate, actionable instructions for the tests this phase added
+- [x] 5.2 §6.1 and §6.2 read as accurate, actionable instructions for the tests this phase added — a492cca

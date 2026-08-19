@@ -73,7 +73,7 @@ orchestrator updates Status as artifacts appear on disk.
 
 | # | Phase name | Goal (one line) | Risks covered | Test types | Status | Change folder |
 |---|---|---|---|---|---|---|
-| 1 | Extraction integrity & visible feedback | Catch silent-garbage extraction and make failures visible in the upload UI | #2, #3 | unit + component | researched | `context/changes/testing-extraction-integrity/` |
+| 1 | Extraction integrity & visible feedback | Catch silent-garbage extraction and make failures visible in the upload UI | #2, #3 | unit + component | complete | `context/changes/testing-extraction-integrity/` |
 | 2 | Cross-user access & reference integrity | Prove RLS actually isolates users and that photo references stay scoped to their owner | #4, #6 | integration | not started | — |
 | 3 | Reversible removal correctness | Verify trash/restore round-trips without data loss | #5 | integration | not started | — |
 | 4 | CI gate & resource-abuse posture | Make the test suite a required CI gate; establish whether extraction cost controls exist | #1, #7 | gates + research | not started | — |

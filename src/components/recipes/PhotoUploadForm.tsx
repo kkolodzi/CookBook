@@ -157,8 +157,8 @@ export default function PhotoUploadForm() {
           <p className="text-lg font-semibold">{successData.recipe.name}</p>
           <p className="text-sm text-blue-100/70">{RECIPE_TYPE_LABELS[successData.recipe.type]}</p>
           <ul className="mt-3 list-inside list-disc space-y-1 text-sm text-blue-100/80">
-            {successData.recipe.ingredients.map((ingredient) => (
-              <li key={ingredient}>{ingredient}</li>
+            {successData.recipe.ingredients.map((ingredient, index) => (
+              <li key={index}>{ingredient}</li>
             ))}
           </ul>
           {successData.recipe.instructions && (

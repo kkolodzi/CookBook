@@ -510,10 +510,10 @@ never re-validated retroactively; the guard only governs future writes, consiste
 
 #### Automated
 
-- [x] 3.1 `supabase link --project-ref xmyeeuyeszvpvrjszohr` succeeds; `supabase db push` exits 0 (dev)
-- [x] 3.2 `npm run test:integration` passes, including both cases in `photo-path-ownership.test.ts`, against dev
-- [x] 3.3 `supabase link --project-ref gtrhakzhlammvfifvlyf` succeeds; `supabase db push` exits 0 (prod)
-- [x] 3.4 `npm run lint` passes
+- [x] 3.1 `supabase link --project-ref xmyeeuyeszvpvrjszohr` succeeds; `supabase db push` exits 0 (dev) — a328f2a
+- [x] 3.2 `npm run test:integration` passes, including both cases in `photo-path-ownership.test.ts`, against dev — a328f2a
+- [x] 3.3 `supabase link --project-ref gtrhakzhlammvfifvlyf` succeeds; `supabase db push` exits 0 (prod) — a328f2a
+- [x] 3.4 `npm run lint` passes — a328f2a
 
 #### Manual
 

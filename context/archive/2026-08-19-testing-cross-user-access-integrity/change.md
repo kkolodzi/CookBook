@@ -1,10 +1,10 @@
 ---
 change_id: testing-cross-user-access-integrity
 title: Cross-user access and reference integrity testing
-status: impl_reviewed
+status: archived
 created: 2026-08-19
 updated: 2026-08-20
-archived_at: null
+archived_at: 2026-08-20T10:37:33Z
 ---
 
 ## Notes

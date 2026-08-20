@@ -107,6 +107,70 @@ describe("cross-user RLS isolation", () => {
       expect(data).toBeNull();
       expect(error).not.toBeNull();
     });
+
+    it("allows the owner to select their own ingredients", async () => {
+      const { recipeId } = await createRecipeAs(userA, "A's recipe — ingredients owner select");
+      const { error: setupError } = await userA.client
+        .from("recipe_ingredients")
+        .insert({ recipe_id: recipeId, name: "Flour", position: 0 });
+      if (setupError) {
+        throw new Error(`Setup ingredient insert failed: ${setupError.message}`);
+      }
+
+      const { data, error } = await userA.client.from("recipe_ingredients").select().eq("recipe_id", recipeId);
+      expect(error).toBeNull();
+      expect(data).toHaveLength(1);
+    });
+
+    it("denies a cross-user update of an ingredient", async () => {
+      const { recipeId } = await createRecipeAs(userA, "A's recipe — ingredient update denial");
+      const { data: ingredient, error: setupError } = await userA.client
+        .from("recipe_ingredients")
+        .insert({ recipe_id: recipeId, name: "Flour", position: 0 })
+        .select()
+        .single();
+      if (setupError) {
+        throw new Error(`Setup ingredient insert failed: ${setupError.message}`);
+      }
+
+      const { data, error } = await userB.client
+        .from("recipe_ingredients")
+        .update({ name: "hacked" })
+        .eq("id", ingredient.id)
+        .select();
+      expect(error).toBeNull();
+      expect(data).toEqual([]);
+
+      const { data: stillOriginal } = await userA.client
+        .from("recipe_ingredients")
+        .select("name")
+        .eq("id", ingredient.id)
+        .single();
+      expect(stillOriginal?.name).toBe("Flour");
+    });
+
+    it("denies a cross-user delete of an ingredient", async () => {
+      const { recipeId } = await createRecipeAs(userA, "A's recipe — ingredient delete denial");
+      const { data: ingredient, error: setupError } = await userA.client
+        .from("recipe_ingredients")
+        .insert({ recipe_id: recipeId, name: "Flour", position: 0 })
+        .select()
+        .single();
+      if (setupError) {
+        throw new Error(`Setup ingredient insert failed: ${setupError.message}`);
+      }
+
+      const { data, error } = await userB.client.from("recipe_ingredients").delete().eq("id", ingredient.id).select();
+      expect(error).toBeNull();
+      expect(data).toEqual([]);
+
+      const { data: stillThere } = await userA.client
+        .from("recipe_ingredients")
+        .select("id")
+        .eq("id", ingredient.id)
+        .single();
+      expect(stillThere?.id).toBe(ingredient.id);
+    });
   });
 
   describe("storage.objects (recipe-photos bucket)", () => {

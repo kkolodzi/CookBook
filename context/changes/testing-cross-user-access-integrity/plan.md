@@ -492,8 +492,8 @@ never re-validated retroactively; the guard only governs future writes, consiste
 
 #### Manual
 
-- [ ] 1.3 `.env.test.local` does not appear in `git status`
-- [ ] 1.4 Studio (dev): smoke test's `integration-test-` user and recipe row visible
+- [x] 1.3 `.env.test.local` does not appear in `git status`
+- [x] 1.4 Studio (dev): smoke test's `integration-test-` user and recipe row visible
 
 ### Phase 2: Cross-user RLS integration tests (risk #4)
 
@@ -504,7 +504,7 @@ never re-validated retroactively; the guard only governs future writes, consiste
 
 #### Manual
 
-- [ ] 2.3 Studio (dev) → Authentication: this phase's `integration-test-` users are present
+- [x] 2.3 Studio (dev) → Authentication: this phase's `integration-test-` users are present
 
 ### Phase 3: `photo_path` ownership DB fix, deployed to dev then prod (risk #6)
 
@@ -517,13 +517,13 @@ never re-validated retroactively; the guard only governs future writes, consiste
 
 #### Manual
 
-- [ ] 3.5 Trigger + function present on `recipes` in dev Studio
-- [ ] 3.6 Trigger + function present on `recipes` in prod Studio
-- [ ] 3.7 Spot-checked existing recipe row still readable in both projects
-- [ ] 3.8 Real photo-upload flow still succeeds against dev, then against prod after the push
+- [x] 3.5 Trigger + function present on `recipes` in dev Studio
+- [x] 3.6 Trigger + function present on `recipes` in prod Studio
+- [x] 3.7 Spot-checked existing recipe row still readable in both projects
+- [x] 3.8 Real photo-upload flow still succeeds against dev, then against prod after the push
 
 ### Phase 4: Cookbook update
 
 #### Manual
 
-- [ ] 4.1 §6.3 reads accurately against what Phases 1-3 actually built
+- [x] 4.1 §6.3 reads accurately against what Phases 1-3 actually built

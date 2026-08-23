@@ -79,7 +79,12 @@ describe("trash/restore round-trip", () => {
     const { error: trashError } = await trash(recipe.id);
     expect(trashError).toBeNull();
 
-    const { data: trashedRow } = await user.client.from("recipes").select("deleted_at").eq("id", recipe.id).single();
+    const { data: trashedRow, error: trashedRowError } = await user.client
+      .from("recipes")
+      .select("deleted_at")
+      .eq("id", recipe.id)
+      .single();
+    expect(trashedRowError).toBeNull();
     expect(trashedRow?.deleted_at).not.toBeNull();
 
     const { error: restoreError } = await restore(recipe.id);
@@ -127,11 +132,17 @@ describe("trash/restore round-trip", () => {
 
     const { data: restoredRecipe, error: restoredError } = await user.client
       .from("recipes")
-      .select("name, type")
+      .select("name, type, instructions")
       .eq("id", recipe.id)
       .single();
     expect(restoredError).toBeNull();
-    expect(restoredRecipe).toMatchObject({ name: "Edit-then-trash recipe (edited)", type: "dessert" });
+    // p_instructions was omitted from the edit_recipe call above, so the RPC nulls it out —
+    // asserted here explicitly rather than left unexamined.
+    expect(restoredRecipe).toMatchObject({
+      name: "Edit-then-trash recipe (edited)",
+      type: "dessert",
+      instructions: null,
+    });
 
     const finalIngredients = await getIngredients(recipe.id);
     expect(finalIngredients).toEqual(postEditIngredients);
@@ -143,18 +154,24 @@ describe("trash/restore round-trip", () => {
     const { error: firstTrashError } = await trash(recipe.id);
     expect(firstTrashError).toBeNull();
 
-    const { data: afterFirstTrash } = await user.client
+    const { data: afterFirstTrash, error: afterFirstTrashError } = await user.client
       .from("recipes")
       .select("deleted_at")
       .eq("id", recipe.id)
       .single();
+    expect(afterFirstTrashError).toBeNull();
     const firstDeletedAt = afterFirstTrash?.deleted_at;
 
     const { data: secondTrashData, error: secondTrashError } = await trash(recipe.id);
     expect(secondTrashData).toBeNull();
     expect(secondTrashError).not.toBeNull();
 
-    const { data: stillTrashed } = await user.client.from("recipes").select("deleted_at").eq("id", recipe.id).single();
+    const { data: stillTrashed, error: stillTrashedError } = await user.client
+      .from("recipes")
+      .select("deleted_at")
+      .eq("id", recipe.id)
+      .single();
+    expect(stillTrashedError).toBeNull();
     expect(stillTrashed?.deleted_at).toBe(firstDeletedAt);
   });
 

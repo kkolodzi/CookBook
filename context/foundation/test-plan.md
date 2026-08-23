@@ -6,7 +6,7 @@
 >
 > Refresh: re-run `/10x-test-plan --refresh` when stale (see §8).
 >
-> Last updated: 2026-08-20 (§3 Phase 3: change opened)
+> Last updated: 2026-08-23 (§3 Phase 3: researched)
 
 ## 1. Strategy
 
@@ -75,7 +75,7 @@ orchestrator updates Status as artifacts appear on disk.
 | --- | --------------------------------------- | ---------------------------------------------------------------------------------------- | ------------- | ---------------- | ------------- | ------------------------------------------------------ |
 | 1   | Extraction integrity & visible feedback | Catch silent-garbage extraction and make failures visible in the upload UI               | #2, #3        | unit + component | complete      | `context/changes/testing-extraction-integrity/`        |
 | 2   | Cross-user access & reference integrity | Prove RLS actually isolates users and that photo references stay scoped to their owner   | #4, #6        | integration      | complete      | `context/changes/testing-cross-user-access-integrity/` |
-| 3   | Reversible removal correctness          | Verify trash/restore round-trips without data loss                                       | #5            | integration      | change opened | `context/changes/testing-reversible-removal-correctness/` |
+| 3   | Reversible removal correctness          | Verify trash/restore round-trips without data loss                                       | #5            | integration      | researched    | `context/changes/testing-reversible-removal-correctness/` |
 | 4   | CI gate & resource-abuse posture        | Make the test suite a required CI gate; establish whether extraction cost controls exist | #1, #7        | gates + research | not started   | —                                                      |
 
 ## 4. Stack
@@ -175,6 +175,19 @@ the relevant rollout phase ships; before that, the sub-section reads
 - **When NOT to use**: for anything the existing mocked-Supabase convention (§6.4) already covers —
   this layer exists specifically for claims a mock can't verify (RLS enforcement, trigger behavior,
   real cross-user identity checks), not as a general replacement for API-contract tests.
+
+**Variant: soft-delete / app-level visibility filters.** Same harness, same location convention,
+same run command — but the invariant under test is an application-level query filter
+(`.is("deleted_at", null)` / `.not("deleted_at", "is", null)`), not an RLS policy. Some tables in
+this project (e.g. `recipes`) use RLS strictly for ownership and leave "active vs. trashed"
+visibility entirely to the app layer with no database-level backstop, so a forgotten filter on a
+new read path is a real, previously-hit failure mode — this variant proves each read surface
+still applies it. Call the real production function where one is extractable (e.g. `listRecipes`,
+`getRecipeDetail` from `@/lib/services/recipe-query`) rather than re-implementing the filter
+inline; for surfaces with no extractable function (an Astro page/route), mirror the exact
+production query instead of driving it through HTTP. Reference tests:
+`tests/integration/trash-restore-roundtrip.test.ts`,
+`tests/integration/trashed-recipe-visibility.test.ts`.
 
 ### 6.4 Adding a test for a new API endpoint
 

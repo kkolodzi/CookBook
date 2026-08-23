@@ -1,7 +1,7 @@
 ---
 change_id: testing-reversible-removal-correctness
 title: Reversible removal correctness (trash/restore round-trip integrity)
-status: implementing
+status: implemented
 created: 2026-08-21
 updated: 2026-08-23
 archived_at: null

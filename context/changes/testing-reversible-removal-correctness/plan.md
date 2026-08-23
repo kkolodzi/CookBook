@@ -311,32 +311,32 @@ Not applicable — no schema or data changes in this phase.
 
 #### Automated
 
-- [x] 1.1 Integration suite passes: `npm run test:integration`
-- [x] 1.2 Lint passes: `npm run lint`
+- [x] 1.1 Integration suite passes: `npm run test:integration` — 26575ba
+- [x] 1.2 Lint passes: `npm run lint` — 26575ba
 
 #### Manual
 
 - [x] 1.3 `npm run test:integration -- trash-restore-roundtrip` passes twice in a row, no
-      flakiness
+      flakiness — 26575ba
 
 ### Phase 2: Trashed-recipe read-path visibility
 
 #### Automated
 
-- [x] 2.1 Integration suite passes: `npm run test:integration`
-- [x] 2.2 Lint passes: `npm run lint`
+- [x] 2.1 Integration suite passes: `npm run test:integration` — 26575ba
+- [x] 2.2 Lint passes: `npm run lint` — 26575ba
 
 #### Manual
 
 - [x] 2.3 `npm run test:integration -- trashed-recipe-visibility` passes twice in a row, no
-      flakiness
+      flakiness — 26575ba
 
 ### Phase 3: Cookbook update
 
 #### Automated
 
-- [x] 3.1 Lint passes: `npm run lint`
+- [x] 3.1 Lint passes: `npm run lint` — 26575ba
 
 #### Manual
 
-- [x] 3.2 §6.3 variant note reads coherently and points to the correct reference tests
+- [x] 3.2 §6.3 variant note reads coherently and points to the correct reference tests — 26575ba

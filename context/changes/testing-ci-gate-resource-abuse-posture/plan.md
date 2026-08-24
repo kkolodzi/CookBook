@@ -296,8 +296,8 @@ Not applicable — no schema changes; the extraction rate-limit schema already e
 
 #### Automated
 
-- [x] 3.1 Lint passes: `npm run lint`
+- [x] 3.1 Lint passes: `npm run lint` — 828340e
 
 #### Manual
 
-- [x] 3.2 CLAUDE.md CI section and test-plan.md §2 Risk #7 both read coherently and match reality
+- [x] 3.2 CLAUDE.md CI section and test-plan.md §2 Risk #7 both read coherently and match reality — 828340e

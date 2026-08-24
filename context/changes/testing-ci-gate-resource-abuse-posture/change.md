@@ -1,7 +1,7 @@
 ---
 change_id: testing-ci-gate-resource-abuse-posture
 title: CI gate & resource-abuse posture (wire test suite into CI, assess extraction cost controls)
-status: implementing
+status: implemented
 created: 2026-08-23
 updated: 2026-08-23
 archived_at: null

@@ -30,3 +30,7 @@ pnpm-debug.log*
 
 # 10xDevs course skills (not public)
 .claude/
+
+# stryker temp files
+.stryker-tmp
+reports/

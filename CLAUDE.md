@@ -54,7 +54,15 @@ Pre-commit hooks: husky + lint-staged runs `eslint --fix` on `*.{ts,tsx,astro}` 
 
 ## CI
 
-GitHub Actions workflow (`.github/workflows/ci.yml`) runs lint + test + build on every push and PR to main. Requires `SUPABASE_URL` and `SUPABASE_KEY` repository secrets for the build step. `npm run test` needs no secrets; `npm run test:integration` is not wired into CI.
+GitHub Actions workflow (`.github/workflows/ci.yml`) runs lint + test + integration-test + build on every push and PR to main; the `ci` check is required by branch protection on `main` (informational for direct pushes, enforced once a PR is used). Requires `SUPABASE_URL`/`SUPABASE_KEY` (build) and `SUPABASE_TEST_URL`/`SUPABASE_TEST_ANON_KEY` (integration tests) repository secrets. `npm run test` needs no secrets.
+
+## Mutation testing
+
+Repo uses Stryker for selective mutation testing on risk-critical modules.
+Run it only for code covered by the current change or a risk from test-plan.md,
+prefer narrowed scope with `--mutate "path/to/file.ts:start-end"`, and do not chase
+100% mutation score. Survived mutants should be reviewed one by one: add an
+assertion only when the mutant represents a user-visible or business-relevant bug.
 
 <!-- BEGIN @przeprogramowani/10x-cli -->
 

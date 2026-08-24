@@ -7,10 +7,12 @@ vi.mock("astro:env/server", () => ({
 
 const { extractRecipeFromPhoto } = await import("./recipe-extraction");
 
-function mockFetchResponse(body: unknown, ok = true): Response {
+function mockFetchResponse(body: unknown, ok = true, status = 200): Response {
   return {
     ok,
+    status,
     json: () => Promise.resolve(body),
+    text: () => Promise.resolve(typeof body === "string" ? body : JSON.stringify(body)),
   } as Response;
 }
 
@@ -152,6 +154,85 @@ describe("extractRecipeFromPhoto", () => {
     const result = await extractRecipeFromPhoto(imageBytes, "image/jpeg");
 
     expect(result).toEqual({ success: false, reason: "technical_error", raw: "not json" });
+  });
+
+  it("downgrades a response with a blank name to incomplete_extraction even when ingredients are present", async () => {
+    const modelPayload = {
+      is_recipe: true,
+      not_recipe_reason: null,
+      name: "   ",
+      type: null,
+      ingredients: ["mąka"],
+      instructions: null,
+    };
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(mockFetchResponse(chatCompletion(modelPayload))));
+
+    const result = await extractRecipeFromPhoto(imageBytes, "image/jpeg");
+
+    expect(result).toEqual({ success: false, reason: "incomplete_extraction", raw: modelPayload });
+  });
+
+  it("downgrades a response with a null name to incomplete_extraction even when ingredients are present", async () => {
+    const modelPayload = {
+      is_recipe: true,
+      not_recipe_reason: null,
+      name: null,
+      type: null,
+      ingredients: ["mąka"],
+      instructions: null,
+    };
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(mockFetchResponse(chatCompletion(modelPayload))));
+
+    const result = await extractRecipeFromPhoto(imageBytes, "image/jpeg");
+
+    expect(result).toEqual({ success: false, reason: "incomplete_extraction", raw: modelPayload });
+  });
+
+  it("maps a model-reported non-recipe response to its self-reported failure reason", async () => {
+    const modelPayload = {
+      is_recipe: false,
+      not_recipe_reason: "blurry_or_low_light",
+      name: null,
+      type: null,
+      ingredients: [],
+      instructions: null,
+    };
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(mockFetchResponse(chatCompletion(modelPayload))));
+
+    const result = await extractRecipeFromPhoto(imageBytes, "image/jpeg");
+
+    expect(result).toEqual({ success: false, reason: "blurry_or_low_light", raw: modelPayload });
+  });
+
+  it("maps a response missing the expected choices/message shape to technical_error", async () => {
+    const malformedBody = { choices: [] };
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(mockFetchResponse(malformedBody)));
+
+    const result = await extractRecipeFromPhoto(imageBytes, "image/jpeg");
+
+    expect(result).toEqual({ success: false, reason: "technical_error", raw: malformedBody });
+  });
+
+  it("rejects an unsupported mime type before ever calling fetch", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await extractRecipeFromPhoto(imageBytes, "image/gif");
+
+    expect(result).toEqual({ success: false, reason: "technical_error", raw: null });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("maps a non-ok HTTP response to technical_error, capturing status and body", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(mockFetchResponse("rate limited", false, 429)));
+
+    const result = await extractRecipeFromPhoto(imageBytes, "image/jpeg");
+
+    expect(result).toEqual({
+      success: false,
+      reason: "technical_error",
+      raw: { status: 429, body: "rate limited" },
+    });
   });
 
   it("maps a timeout to technical_error", async () => {

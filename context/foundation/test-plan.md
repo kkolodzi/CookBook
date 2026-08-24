@@ -6,7 +6,7 @@
 >
 > Refresh: re-run `/10x-test-plan --refresh` when stale (see §8).
 >
-> Last updated: 2026-08-23 (§3 Phase 4: change opened)
+> Last updated: 2026-08-24 (§3 Phase 4: complete — rollout complete, all phases done)
 
 ## 1. Strategy
 
@@ -76,7 +76,7 @@ orchestrator updates Status as artifacts appear on disk.
 | 1   | Extraction integrity & visible feedback | Catch silent-garbage extraction and make failures visible in the upload UI               | #2, #3        | unit + component | complete      | `context/changes/testing-extraction-integrity/`        |
 | 2   | Cross-user access & reference integrity | Prove RLS actually isolates users and that photo references stay scoped to their owner   | #4, #6        | integration      | complete      | `context/changes/testing-cross-user-access-integrity/` |
 | 3   | Reversible removal correctness          | Verify trash/restore round-trips without data loss                                       | #5            | integration      | complete      | `context/changes/testing-reversible-removal-correctness/` |
-| 4   | CI gate & resource-abuse posture        | Make the test suite a required CI gate; establish whether extraction cost controls exist | #1, #7        | gates + research | change opened | `context/changes/testing-ci-gate-resource-abuse-posture/` |
+| 4   | CI gate & resource-abuse posture        | Make the test suite a required CI gate; establish whether extraction cost controls exist | #1, #7        | gates + research | complete      | `context/changes/testing-ci-gate-resource-abuse-posture/` |
 
 ## 4. Stack
 

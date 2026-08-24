@@ -1,10 +1,10 @@
 ---
 change_id: testing-extraction-integrity
 title: Testing extraction integrity
-status: impl_reviewed
+status: archived
 created: 2026-08-18
-updated: 2026-08-19
-archived_at: null
+updated: 2026-08-24
+archived_at: 2026-08-24T14:07:21Z
 ---
 
 ## Notes

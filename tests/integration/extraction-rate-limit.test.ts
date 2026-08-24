@@ -22,6 +22,10 @@ describe("extraction rate limit", () => {
     expect(results).toEqual([true, true, true, false]);
   });
 
+  // Deliberately depends on the previous test's state (relies on Vitest's default sequential
+  // `it` execution within a file) -- reusing `user` here, rather than a fresh one, is what
+  // proves the counter persists across separate reservation calls instead of resetting.
+  // Reordering, parallelizing, or skipping the test above will break this one.
   it("keeps counting against the same day across multiple reservation calls", async () => {
     const { data, error } = await user.client.rpc("reserve_extraction_attempt", { p_cap: 10 });
     expect(error).toBeNull();

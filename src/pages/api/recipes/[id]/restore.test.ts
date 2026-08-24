@@ -5,7 +5,7 @@ vi.mock("@/lib/supabase", () => ({
   createClient: vi.fn(),
 }));
 
-const { POST } = await import("./restore");
+const { POST, prerender } = await import("./restore");
 const { createClient } = await import("@/lib/supabase");
 
 interface MockConfig {
@@ -41,6 +41,10 @@ describe("POST /api/recipes/[id]/restore", () => {
     vi.mocked(createClient).mockReset();
   });
 
+  it("is not prerendered (full SSR, per project convention)", () => {
+    expect(prerender).toBe(false);
+  });
+
   it("returns 401 for an unauthenticated request", async () => {
     const response = await POST(makeContext({ user: null }));
 
@@ -56,8 +60,11 @@ describe("POST /api/recipes/[id]/restore", () => {
 
     expect(response.status).toBe(200);
     expect(body).toEqual({ id: "recipe-1" });
+    expect(client.from).toHaveBeenCalledWith("recipes");
     expect(client.recipesChain.update).toHaveBeenCalledWith({ deleted_at: null });
+    expect(client.recipesChain.eq).toHaveBeenCalledWith("id", "recipe-1");
     expect(client.recipesChain.not).toHaveBeenCalledWith("deleted_at", "is", null);
+    expect(client.recipesChain.select).toHaveBeenCalledWith("id");
   });
 
   it("returns 404 when the recipe isn't found, owned, or not currently deleted", async () => {

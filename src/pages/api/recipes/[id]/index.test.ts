@@ -5,7 +5,7 @@ vi.mock("@/lib/supabase", () => ({
   createClient: vi.fn(),
 }));
 
-const { GET, PATCH, DELETE } = await import("./index");
+const { GET, PATCH, DELETE, prerender } = await import("./index");
 const { createClient } = await import("@/lib/supabase");
 
 interface MockConfig {
@@ -76,6 +76,10 @@ const validPatchBody = {
 describe("GET /api/recipes/[id]", () => {
   beforeEach(() => {
     vi.mocked(createClient).mockReset();
+  });
+
+  it("is not prerendered (full SSR, per project convention)", () => {
+    expect(prerender).toBe(false);
   });
 
   it("returns 401 for an unauthenticated request", async () => {
@@ -207,8 +211,11 @@ describe("DELETE /api/recipes/[id]", () => {
 
     expect(response.status).toBe(200);
     expect(body).toEqual({ id: "recipe-1" });
+    expect(client.from).toHaveBeenCalledWith("recipes");
     const [updateArg] = client.recipesChain.update.mock.calls[0] as [{ deleted_at: string }];
     expect(typeof updateArg.deleted_at).toBe("string");
+    expect(client.recipesChain.eq).toHaveBeenCalledWith("id", "recipe-1");
+    expect(client.recipesChain.is).toHaveBeenCalledWith("deleted_at", null);
   });
 
   it("returns 404 when the recipe isn't found, owned, or already deleted", async () => {

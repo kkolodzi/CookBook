@@ -5,7 +5,7 @@ vi.mock("@/lib/supabase", () => ({
   createClient: vi.fn(),
 }));
 
-const { GET } = await import("./trash");
+const { GET, prerender } = await import("./trash");
 const { createClient } = await import("@/lib/supabase");
 
 function mockSupabaseClient(config: { data?: unknown[] | null; error?: unknown } = {}) {
@@ -31,6 +31,10 @@ describe("GET /api/recipes/trash", () => {
     vi.mocked(createClient).mockReset();
   });
 
+  it("is not prerendered (full SSR, per project convention)", () => {
+    expect(prerender).toBe(false);
+  });
+
   it("returns 401 for an unauthenticated request", async () => {
     const response = await GET(makeContext(null));
 
@@ -48,6 +52,8 @@ describe("GET /api/recipes/trash", () => {
 
     expect(response.status).toBe(200);
     expect(body.recipes).toEqual([{ id: "r1", name: "Zupa", type: "soup", deletedAt: "2026-08-16T10:00:00Z" }]);
+    expect(client.from).toHaveBeenCalledWith("recipes");
+    expect(client.recipesChain.select).toHaveBeenCalledWith("id, name, type, deleted_at");
     expect(client.recipesChain.not).toHaveBeenCalledWith("deleted_at", "is", null);
     expect(client.recipesChain.order).toHaveBeenCalledWith("deleted_at", { ascending: false });
   });

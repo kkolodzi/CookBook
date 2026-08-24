@@ -15,6 +15,6 @@ export default defineConfig({
   test: {
     environment: "node",
     setupFiles: ["./vitest.setup.ts"],
-    exclude: [...configDefaults.exclude, "tests/integration/**"],
+    exclude: [...configDefaults.exclude, "tests/integration/**", ".stryker-tmp/**"],
   },
 });

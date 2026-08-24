@@ -272,25 +272,25 @@ Not applicable — no schema changes; the extraction rate-limit schema already e
 
 #### Automated
 
-- [x] 1.1 Workflow YAML is valid
-- [x] 1.2 Lint passes: `npm run lint`
-- [x] 1.3 Local dry run of the added step passes: `npm run test`
+- [x] 1.1 Workflow YAML is valid — 2b56bd0
+- [x] 1.2 Lint passes: `npm run lint` — 2b56bd0
+- [x] 1.3 Local dry run of the added step passes: `npm run test` — 2b56bd0
 
 #### Manual
 
-- [x] 1.4 A PR against `main` triggers the `ci` check
-- [x] 1.5 A deliberately broken test turns the `ci` check red, then green again after revert
+- [x] 1.4 A PR against `main` triggers the `ci` check — 2b56bd0
+- [x] 1.5 A deliberately broken test turns the `ci` check red, then green again after revert — 2b56bd0
 
 ### Phase 2: Extraction rate-limit concurrency-safety test
 
 #### Automated
 
-- [ ] 2.1 Integration suite passes: `npm run test:integration`
-- [ ] 2.2 Lint passes: `npm run lint`
+- [x] 2.1 Integration suite passes: `npm run test:integration`
+- [x] 2.2 Lint passes: `npm run lint`
 
 #### Manual
 
-- [ ] 2.3 `npm run test:integration -- extraction-rate-limit` passes twice in a row, no flakiness
+- [x] 2.3 `npm run test:integration -- extraction-rate-limit` passes twice in a row, no flakiness
 
 ### Phase 3: Docs sync
 

@@ -285,19 +285,19 @@ Not applicable — no schema changes; the extraction rate-limit schema already e
 
 #### Automated
 
-- [x] 2.1 Integration suite passes: `npm run test:integration`
-- [x] 2.2 Lint passes: `npm run lint`
+- [x] 2.1 Integration suite passes: `npm run test:integration` — 7942b8a
+- [x] 2.2 Lint passes: `npm run lint` — 7942b8a
 
 #### Manual
 
-- [x] 2.3 `npm run test:integration -- extraction-rate-limit` passes twice in a row, no flakiness
+- [x] 2.3 `npm run test:integration -- extraction-rate-limit` passes twice in a row, no flakiness — 7942b8a
 
 ### Phase 3: Docs sync
 
 #### Automated
 
-- [ ] 3.1 Lint passes: `npm run lint`
+- [x] 3.1 Lint passes: `npm run lint`
 
 #### Manual
 
-- [ ] 3.2 CLAUDE.md CI section and test-plan.md §2 Risk #7 both read coherently and match reality
+- [x] 3.2 CLAUDE.md CI section and test-plan.md §2 Risk #7 both read coherently and match reality

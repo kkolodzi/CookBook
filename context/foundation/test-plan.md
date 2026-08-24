@@ -6,7 +6,7 @@
 >
 > Refresh: re-run `/10x-test-plan --refresh` when stale (see §8).
 >
-> Last updated: 2026-08-23 (§3 Phase 3: researched)
+> Last updated: 2026-08-23 (§3 Phase 4: change opened)
 
 ## 1. Strategy
 
@@ -63,7 +63,7 @@ requirement for a product with auth and AI input.
 | #4   | Cross-user reads/writes against recipes and storage objects are denied by the database itself, verified without mocking Supabase                                   | Whether mocking the Supabase client (today's default convention) is quietly treated as sufficient coverage for this risk — it is not | RLS policy definitions on `recipes` and `storage.objects`; how to seed two distinct authenticated users in a test environment             | integration test against local Supabase (real Postgres + policies) | Over-mocking — asserting the app "calls Supabase correctly" instead of asserting the database refuses the cross-user operation |
 | #5   | A full trash → restore round-trip preserves every field, including edit-then-remove-then-restore sequences                                                         | Whether restore is assumed to be the exact inverse of trash, or whether partial/concurrent states are reachable                      | The trash/restore state transitions and whether removal is soft-delete or a separate table                                                | integration test on the trash/restore flow                         | Testing trash and restore as two independent unit tests that never verify the round-trip together                              |
 | #6   | A recipe's photo reference cannot be set to point at a storage object the acting user doesn't own, even when the insert path is exercised directly                 | Whether this is already fully covered by Risk #4's RLS test, or is a distinct path worth its own case                                | How `photo_path` is populated end-to-end (upload response → recipe insert), and whether any path accepts it as raw client input           | integration test, same layer as #4, narrower fixture               | Assuming "RLS covers it" without a test proving this specific insert path is actually subject to the same policy               |
-| #7   | (Research-first) whether a cost-control mechanism exists at all for the extraction call path                                                                       | Do not invent a rate-limit test for a safeguard that may not exist — that tests nothing real                                         | Whether any request throttling, quota, or cost cap exists today for the extraction call path                                              | research spike (no test code assumed)                              | Writing a test that asserts current, possibly nonexistent, behavior as if it were an intentional safeguard                     |
+| #7   | The atomic per-user-per-day extraction cap (`reserve_extraction_attempt`) correctly enforces its limit across repeated calls, verified against real Postgres, not just a mocked RPC result | Do not assume the atomic `INSERT ... ON CONFLICT` upsert is race-safe without a test proving it — its whole purpose is a prior TOCTOU-race fix | The migration and call site already grounded in `context/changes/testing-ci-gate-resource-abuse-posture/research.md` — the mechanism exists and is correctly wired before the AI call; nothing further to research | integration test directly against the RPC, real Postgres           | Asserting against the production route's hardcoded cap value instead of a test-owned `p_cap` — couples the test to an implementation detail with no PRD/roadmap authority |
 
 ## 3. Phased Rollout
 
@@ -75,8 +75,8 @@ orchestrator updates Status as artifacts appear on disk.
 | --- | --------------------------------------- | ---------------------------------------------------------------------------------------- | ------------- | ---------------- | ------------- | ------------------------------------------------------ |
 | 1   | Extraction integrity & visible feedback | Catch silent-garbage extraction and make failures visible in the upload UI               | #2, #3        | unit + component | complete      | `context/changes/testing-extraction-integrity/`        |
 | 2   | Cross-user access & reference integrity | Prove RLS actually isolates users and that photo references stay scoped to their owner   | #4, #6        | integration      | complete      | `context/changes/testing-cross-user-access-integrity/` |
-| 3   | Reversible removal correctness          | Verify trash/restore round-trips without data loss                                       | #5            | integration      | researched    | `context/changes/testing-reversible-removal-correctness/` |
-| 4   | CI gate & resource-abuse posture        | Make the test suite a required CI gate; establish whether extraction cost controls exist | #1, #7        | gates + research | not started   | —                                                      |
+| 3   | Reversible removal correctness          | Verify trash/restore round-trips without data loss                                       | #5            | integration      | complete      | `context/changes/testing-reversible-removal-correctness/` |
+| 4   | CI gate & resource-abuse posture        | Make the test suite a required CI gate; establish whether extraction cost controls exist | #1, #7        | gates + research | change opened | `context/changes/testing-ci-gate-resource-abuse-posture/` |
 
 ## 4. Stack
 

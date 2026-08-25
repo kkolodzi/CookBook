@@ -1,10 +1,10 @@
 ---
 change_id: fix-polish-ingredient-search
 title: Fix Polish ingredient search to match grammatical-case variants
-status: impl_reviewed
+status: archived
 created: 2026-08-25
 updated: 2026-08-25
-archived_at: null
+archived_at: 2026-08-25T14:59:55Z
 ---
 
 ## Notes

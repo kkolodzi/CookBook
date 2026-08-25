@@ -46,7 +46,7 @@ Home cooks save recipes on social media but can't find them at meal time — the
 | S-02 | recipe-search-and-browse | search recipes by ingredient, filter by type, view details       | S-01           | FR-013, FR-015, FR-016, FR-018, US-02  | done |
 | S-03 | recipe-edit-and-remove   | edit a saved recipe and remove it reversibly                     | S-01           | FR-019, FR-020                         | done |
 | S-04 | recipe-prep-instructions | see a recipe's preparation instructions, extracted from the photo | S-01           | FR-021, FR-018, FR-019                 | done |
-| S-05 | fix-polish-ingredient-search | find a recipe by any grammatical form of a Polish ingredient name | S-02        | FR-015, US-02                          | in-progress |
+| S-05 | fix-polish-ingredient-search | find a recipe by any grammatical form of a Polish ingredient name | S-02        | FR-015, US-02                          | done |
 | S-06 | fix-recipe-list-staleness  | see a just-saved recipe in the collection immediately, no manual refresh | S-01, S-02 | FR-013, US-01                     | ready |
 
 ## Streams
@@ -164,7 +164,7 @@ No new Foundations for M-02 — every layer S-05 and S-06 touch (data query logi
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Polish declension has many irregular forms; a naive prefix-truncation fix was already considered and rejected during M-01 manual testing as too imprecise (false positives on short words, doesn't handle vowel alternation like masło→masła). A real fix needs actual stemming/lemmatization, which is more effort than a typical bug fix — flagging so `/10x-plan` scopes it as such rather than a one-line patch.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-06: Fix recipe list staleness after save
 
@@ -287,3 +287,4 @@ No new Foundations for M-02 — every layer S-05 and S-06 touch (data query logi
 - **S-02: user can browse the full recipe collection with an empty search, search by ingredient (e.g. "marchewka"), filter by meal type, and view a recipe's full details — name, ingredient list, type, photo, and note.** — Archived 2026-08-16 → `context/archive/2026-08-16-recipe-search-and-browse/`. Lesson: —.
 - **S-03: user can edit a saved recipe's name, ingredient list, type, or note, and can remove a recipe from their collection with the ability to recover it within a defined window.** — Archived 2026-08-16 → `context/archive/2026-08-16-recipe-edit-and-remove/`. Lesson: —.
 - **S-04: user's saved recipe includes preparation instructions extracted from the photo as freeform text; visible in the recipe detail view and editable, same as name/ingredients/type/note today.** — Archived 2026-08-17 → `context/archive/2026-08-16-recipe-prep-instructions/`. Lesson: —.
+- **S-05: user can find a recipe by any grammatical form of a Polish ingredient name — searching "cukier" (nominative) also matches a recipe storing "cukru" (genitive, e.g. "łyżka cukru"), and likewise for other common declension patterns (e.g. "masło" → "masła").** — Archived 2026-08-25 → `context/archive/2026-08-25-fix-polish-ingredient-search/`. Lesson: —.

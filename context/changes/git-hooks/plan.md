@@ -159,12 +159,12 @@ None — additive change to existing tooling config, no data or schema impact.
 
 #### Automated
 
-- [x] 1.1 Lint passes: `npm run lint`
-- [x] 1.2 Unit tests pass: `npm run test`
-- [x] 1.3 `package.json` lint-staged config parses cleanly
+- [x] 1.1 Lint passes: `npm run lint` — 8562240
+- [x] 1.2 Unit tests pass: `npm run test` — 8562240
+- [x] 1.3 `package.json` lint-staged config parses cleanly — 8562240
 
 #### Manual
 
-- [x] 1.4 Broken related test blocks commit with visible failure output
-- [x] 1.5 Fixed test allows commit to succeed running both eslint and vitest related
-- [x] 1.6 `.astro`-only staged change commits successfully with no vitest failure
+- [x] 1.4 Broken related test blocks commit with visible failure output — 8562240
+- [x] 1.5 Fixed test allows commit to succeed running both eslint and vitest related — 8562240
+- [x] 1.6 `.astro`-only staged change commits successfully with no vitest failure — 8562240

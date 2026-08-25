@@ -1,9 +1,9 @@
 ---
 change_id: git-hooks
 title: Add pre-commit git hook running lint and tests on staged files
-status: implementing
+status: implemented
 created: 2026-08-24
-updated: 2026-08-24
+updated: 2026-08-25
 archived_at: null
 ---
 

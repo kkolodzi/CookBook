@@ -46,7 +46,7 @@ Home cooks save recipes on social media but can't find them at meal time — the
 | S-02 | recipe-search-and-browse | search recipes by ingredient, filter by type, view details       | S-01           | FR-013, FR-015, FR-016, FR-018, US-02  | done |
 | S-03 | recipe-edit-and-remove   | edit a saved recipe and remove it reversibly                     | S-01           | FR-019, FR-020                         | done |
 | S-04 | recipe-prep-instructions | see a recipe's preparation instructions, extracted from the photo | S-01           | FR-021, FR-018, FR-019                 | done |
-| S-05 | fix-polish-ingredient-search | find a recipe by any grammatical form of a Polish ingredient name | S-02        | FR-015, US-02                          | ready |
+| S-05 | fix-polish-ingredient-search | find a recipe by any grammatical form of a Polish ingredient name | S-02        | FR-015, US-02                          | in-progress |
 | S-06 | fix-recipe-list-staleness  | see a just-saved recipe in the collection immediately, no manual refresh | S-01, S-02 | FR-013, US-01                     | ready |
 
 ## Streams
@@ -164,7 +164,7 @@ No new Foundations for M-02 — every layer S-05 and S-06 touch (data query logi
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Polish declension has many irregular forms; a naive prefix-truncation fix was already considered and rejected during M-01 manual testing as too imprecise (false positives on short words, doesn't handle vowel alternation like masło→masła). A real fix needs actual stemming/lemmatization, which is more effort than a typical bug fix — flagging so `/10x-plan` scopes it as such rather than a one-line patch.
-- **Status:** ready
+- **Status:** in-progress
 
 ### S-06: Fix recipe list staleness after save
 

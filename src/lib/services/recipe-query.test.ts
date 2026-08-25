@@ -23,13 +23,15 @@ function makeQueryBuilder(result: QueryResult) {
 
 function makeSupabaseClient(options: {
   queryResult: QueryResult;
+  rpcResult?: QueryResult;
   signedUrlsResult?: { data: { path: string; signedUrl?: string; error?: string | null }[] | null; error: unknown };
 }) {
   const builder = makeQueryBuilder(options.queryResult);
   const from = vi.fn(() => builder);
+  const rpc = vi.fn().mockResolvedValue(options.rpcResult ?? { data: [], error: null });
   const createSignedUrls = vi.fn().mockResolvedValue(options.signedUrlsResult ?? { data: [], error: null });
   const storage = { from: vi.fn().mockReturnValue({ createSignedUrls }) };
-  return { from, storage, builder, createSignedUrls };
+  return { from, rpc, storage, builder, createSignedUrls };
 }
 
 const sampleRow = {
@@ -53,21 +55,50 @@ describe("listRecipes", () => {
     expect(client.builder.ilike).not.toHaveBeenCalled();
   });
 
-  it("filters by ingredient via an embedded recipe_ingredients inner-join ilike", async () => {
+  it("searches via the search_recipes_by_ingredient RPC with the trimmed query", async () => {
     const client = makeSupabaseClient({ queryResult: { data: [], error: null } });
 
     await listRecipes(client as never, "user-1", { q: " marchewka " });
 
-    expect(client.builder.select).toHaveBeenCalledWith(expect.stringContaining("recipe_ingredients!inner"));
-    expect(client.builder.ilike).toHaveBeenCalledWith("recipe_ingredients.name", "%marchewka%");
+    expect(client.rpc).toHaveBeenCalledWith("search_recipes_by_ingredient", {
+      p_query: "marchewka",
+      p_type: undefined,
+    });
+    expect(client.builder.ilike).not.toHaveBeenCalled();
   });
 
-  it("escapes ilike wildcard characters in the search query", async () => {
+  it("passes special characters in the query through unmodified — normalization and wildcard-safety now live in the database", async () => {
     const client = makeSupabaseClient({ queryResult: { data: [], error: null } });
 
     await listRecipes(client as never, "user-1", { q: "50%_off" });
 
-    expect(client.builder.ilike).toHaveBeenCalledWith("recipe_ingredients.name", "%50\\%\\_off%");
+    expect(client.rpc).toHaveBeenCalledWith("search_recipes_by_ingredient", {
+      p_query: "50%_off",
+      p_type: undefined,
+    });
+  });
+
+  it("maps RPC results to summaries with signed photo URLs when searching", async () => {
+    const client = makeSupabaseClient({
+      queryResult: { data: [], error: null },
+      rpcResult: { data: [sampleRow], error: null },
+      signedUrlsResult: {
+        data: [{ path: sampleRow.photo_path, signedUrl: "https://signed.example/recipe-1.jpg", error: null }],
+        error: null,
+      },
+    });
+
+    const result = await listRecipes(client as never, "user-1", { q: "marchewka" });
+
+    expect(result).toEqual([
+      {
+        id: "recipe-1",
+        name: "Zupa pomidorowa",
+        type: "soup",
+        createdAt: "2026-08-16T00:00:00.000Z",
+        photoUrl: "https://signed.example/recipe-1.jpg",
+      },
+    ]);
   });
 
   it("filters by type", async () => {

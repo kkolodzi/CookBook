@@ -49,34 +49,38 @@ export async function listRecipes(
   params: ListRecipesParams,
 ): Promise<RecipeSummaryDto[]> {
   const trimmedQuery = params.q?.trim();
-  const hasQuery = Boolean(trimmedQuery);
 
-  let query = supabase
-    .from("recipes")
-    .select(
-      hasQuery
-        ? "id, name, type, photo_path, created_at, recipe_ingredients!inner(name)"
-        : "id, name, type, photo_path, created_at",
-    )
-    .eq("user_id", userId)
-    .is("deleted_at", null)
-    .order("created_at", { ascending: false })
-    .limit(LIST_RESULT_CAP);
+  let rows: RecipeRow[];
 
   if (trimmedQuery) {
-    const escapedQuery = trimmedQuery.replace(/[\\%_]/g, (match) => `\\${match}`);
-    query = query.ilike("recipe_ingredients.name", `%${escapedQuery}%`);
-  }
-  if (params.type) {
-    query = query.eq("type", params.type);
+    const { data, error } = await supabase.rpc("search_recipes_by_ingredient", {
+      p_query: trimmedQuery,
+      p_type: params.type,
+    });
+    if (error) {
+      return [];
+    }
+    rows = data;
+  } else {
+    let query = supabase
+      .from("recipes")
+      .select("id, name, type, photo_path, created_at")
+      .eq("user_id", userId)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false })
+      .limit(LIST_RESULT_CAP);
+
+    if (params.type) {
+      query = query.eq("type", params.type);
+    }
+
+    const { data, error } = await query;
+    if (error) {
+      return [];
+    }
+    rows = data;
   }
 
-  const { data, error } = await query;
-  if (error) {
-    return [];
-  }
-
-  const rows = data as unknown as RecipeRow[];
   const signedByPath = await signPhotoUrls(
     supabase,
     rows.map((row) => row.photo_path),

@@ -354,24 +354,24 @@ including the real production data on `SnapRecipe_live`.
 
 #### Automated
 
-- [x] 1.1 Migration applies cleanly: `npx supabase db reset`
-- [x] 1.2 Integration test passes: `npm run test:integration`
-- [x] 1.3 Lint passes: `npm run lint`
+- [x] 1.1 Migration applies cleanly: `npx supabase db reset` — e05935f
+- [x] 1.2 Integration test passes: `npm run test:integration` — e05935f
+- [x] 1.3 Lint passes: `npm run lint` — e05935f
 
 #### Manual
 
-- [x] 1.4 Spot-check backfilled `search_key` values in local dev
+- [x] 1.4 Spot-check backfilled `search_key` values in local dev — e05935f
 
 ### Phase 2: Application layer — wire `listRecipes()` to the new RPC
 
 #### Automated
 
-- [ ] 2.1 Unit tests pass: `npm run test`
-- [ ] 2.2 Lint passes: `npm run lint`
+- [x] 2.1 Unit tests pass: `npm run test`
+- [x] 2.2 Lint passes: `npm run lint`
 
 #### Manual
 
-- [ ] 2.3 Search "cukier" finds a "cukru"-stored recipe
-- [ ] 2.4 Search "maslo" (no diacritics) finds a "masła"-stored recipe
-- [ ] 2.5 Search + type filter combination still narrows correctly
-- [ ] 2.6 Non-matching search shows the existing empty state, not an error
+- [x] 2.3 Search "cukier" finds a "cukru"-stored recipe
+- [x] 2.4 Search "maslo" (no diacritics) finds a "masła"-stored recipe
+- [x] 2.5 Search + type filter combination still narrows correctly
+- [x] 2.6 Non-matching search shows the existing empty state, not an error

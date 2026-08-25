@@ -70,7 +70,8 @@
   },
   "lint-staged": {
     "*.{ts,tsx,astro}": [
-      "eslint --fix"
+      "eslint --fix",
+      "vitest related --run"
     ],
     "*.{json,css,md}": [
       "prettier --write"

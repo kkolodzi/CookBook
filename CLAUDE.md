@@ -19,7 +19,7 @@
 - `npm run lint:fix` — auto-fix lint issues
 - `npm run format` — Prettier (includes prettier-plugin-astro + prettier-plugin-tailwindcss)
 
-Pre-commit hooks: husky + lint-staged runs `eslint --fix` on `*.{ts,tsx,astro}` and `prettier --write` on `*.{json,css,md}`.
+Pre-commit hooks: husky + lint-staged runs `eslint --fix` and `vitest related --run` on `*.{ts,tsx,astro}`, and `prettier --write` on `*.{json,css,md}`.
 
 ## Architecture
 

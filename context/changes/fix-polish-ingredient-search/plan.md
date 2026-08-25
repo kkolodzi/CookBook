@@ -366,12 +366,12 @@ including the real production data on `SnapRecipe_live`.
 
 #### Automated
 
-- [x] 2.1 Unit tests pass: `npm run test`
-- [x] 2.2 Lint passes: `npm run lint`
+- [x] 2.1 Unit tests pass: `npm run test` — d190a79
+- [x] 2.2 Lint passes: `npm run lint` — d190a79
 
 #### Manual
 
-- [x] 2.3 Search "cukier" finds a "cukru"-stored recipe
-- [x] 2.4 Search "maslo" (no diacritics) finds a "masła"-stored recipe
-- [x] 2.5 Search + type filter combination still narrows correctly
-- [x] 2.6 Non-matching search shows the existing empty state, not an error
+- [x] 2.3 Search "cukier" finds a "cukru"-stored recipe — d190a79
+- [x] 2.4 Search "maslo" (no diacritics) finds a "masła"-stored recipe — d190a79
+- [x] 2.5 Search + type filter combination still narrows correctly — d190a79
+- [x] 2.6 Non-matching search shows the existing empty state, not an error — d190a79

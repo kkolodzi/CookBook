@@ -3,10 +3,13 @@ project: SnapRecipe
 version: 1
 status: draft
 created: 2026-08-15
-updated: 2026-08-17
+updated: 2026-08-25
 prd_version: 1
-main_goal: speed
-top_blocker: external
+main_goal: quality
+top_blocker: none
+milestone_id: search-and-list-quality
+milestone_seq: 2
+milestone_status: open
 ---
 
 # Roadmap: SnapRecipe
@@ -15,26 +18,36 @@ top_blocker: external
 > Edit-in-place; archive when superseded.
 > Slices below are listed in dependency order. The "At a glance" table is the index.
 
+## Milestone
+
+**M-02: Search and list quality hardening** — Status: open
+
+- **Intent:** M-01's manual testing surfaced two real defects in the already-shipped core loop — ingredient search misses Polish grammatical-case variants (undercutting US-02's core promise), and a just-saved recipe doesn't reliably appear in the collection view. Fix both before adding any new nice-to-have surface area, so the loop M-01 proved stays trustworthy under real daily use.
+- **Source materials:** `context/foundation/prd.md` (v1) — same PRD as M-01, no version change; this milestone targets already-must-have FRs whose implementation has a known defect, not new FR scope.
+- **Done when:** every F-NN and S-NN below is `done`.
+
 ## Vision recap
 
 Home cooks save recipes on social media but can't find them at meal time — the content is visual and unstructured, and platform-native search fails. SnapRecipe solves the "I saved this somewhere" problem: the user photographs a physical recipe, the app extracts the name and ingredients via AI, and the recipe becomes immediately findable by ingredient or type. The product is validated only when the full loop — photo → save → find — works reliably in Polish for a real user (the builder's wife, the design reference and first user).
 
 ## North star
 
-**S-01: Photo → AI extraction → save** — the smallest slice that tests the riskiest assumption behind the whole product: can the app reliably extract a Polish recipe from a photo well enough that a real user never has to type it in by hand? If S-01 works, the rest is delivery; if it doesn't, nothing else matters yet.
+**S-05: Fix Polish ingredient search** — the highest-leverage fix for this milestone: search-by-ingredient (FR-015, must-have) is the primary discovery path US-02 promises, and it currently fails on ordinary Polish grammatical-case variants. Fixing it protects the core loop M-01 already proved works, before any new surface area is added.
 
-> "North star" here means: the smallest end-to-end slice whose successful delivery would prove the assumption the product depends on — placed as early as prerequisites allow, because everything else only matters if this works.
+> M-01's own product-level "north star" — the smallest end-to-end slice whose successful delivery proves the core hypothesis the product depends on — was S-01 (photo → AI extraction → save), already shipped; see `## Milestone History`. M-02 doesn't re-validate the hypothesis, it hardens what M-01 proved.
 
 ## At a glance
 
-| ID   | Change ID                | Outcome (user can …)                                          | Prerequisites | PRD refs                              | Status   |
-| ---- | ------------------------ | --------------------------------------------------------------- | -------------- | -------------------------------------- | -------- |
+| ID   | Change ID                  | Outcome (user can …)                                          | Prerequisites | PRD refs                              | Status   |
+| ---- | --------------------------- | --------------------------------------------------------------- | -------------- | -------------------------------------- | -------- |
 | F-01 | supabase-auth-setup      | (foundation) sign-up and sign-in work; users can be persisted    | —              | FR-001, FR-002                         | done |
 | F-02 | recipe-data-schema       | (foundation) recipe schema with structured ingredients landed    | F-01           | FR-015, FR-008, FR-020                 | done |
 | S-01 | photo-to-recipe-save     | upload a photo, get an AI-extracted recipe saved to collection  | F-01, F-02     | FR-004, FR-005, FR-008, US-01          | done |
 | S-02 | recipe-search-and-browse | search recipes by ingredient, filter by type, view details       | S-01           | FR-013, FR-015, FR-016, FR-018, US-02  | done |
 | S-03 | recipe-edit-and-remove   | edit a saved recipe and remove it reversibly                     | S-01           | FR-019, FR-020                         | done |
 | S-04 | recipe-prep-instructions | see a recipe's preparation instructions, extracted from the photo | S-01           | FR-021, FR-018, FR-019                 | done |
+| S-05 | fix-polish-ingredient-search | find a recipe by any grammatical form of a Polish ingredient name | S-02        | FR-015, US-02                          | ready |
+| S-06 | fix-recipe-list-staleness  | see a just-saved recipe in the collection immediately, no manual refresh | S-01, S-02 | FR-013, US-01                     | ready |
 
 ## Streams
 
@@ -45,20 +58,23 @@ Navigation aid — groups items that share a Prerequisites chain. Canonical orde
 | A      | Core pipeline        | `F-01` → `F-02` → `S-01` → `S-02` | Main sequential path; `S-02` completes the validation loop.     |
 | B      | Recipe management     | `S-03`                             | Parallel with `S-02` after `S-01`; joins Stream A at `S-01`.   |
 | C      | Recipe completeness   | `S-04`                             | Depends on S-01, S-02, and S-03 all being merged (touches the detail-view and edit-form surfaces those two built). All three are merged as of 2026-08-16 — no longer blocked. |
+| D      | Discovery quality (M-02) | `S-05` → `S-06`                | Joins Stream A at `S-02`. Both fix defects in S-02's discovery surface; mutually independent (not a hard dependency chain) but sequenced by main_goal=quality, north star (S-05) first. |
 
 ## Baseline
 
-What's already in place in the codebase as of 2026-08-15 (auto-researched + user-confirmed).
+What's already in place in the codebase as of 2026-08-25 (auto-researched + user-confirmed; refreshed for M-02).
 Foundations below assume these are present and do NOT re-scaffold them.
 
-- **Frontend:** present — Astro 6.4.6 + React 19 + Tailwind 4 + shadcn/ui; auth pages + dashboard at `src/pages/`
-- **Backend / API:** partial — Astro SSR API routes present; only auth endpoints wired (`src/pages/api/auth/{signin,signout,signup}.ts`); no recipe routes, no vision API integration
-- **Data:** absent — `supabase/` contains only `config.toml` and `.gitignore`; no migrations, no recipe schema, no seed data
-- **Auth:** partial — `@supabase/ssr` wired in code (`src/lib/supabase.ts`, `src/middleware.ts` protects `/dashboard`); Supabase project is not configured (confirmed: "Supabase nie jest skonfigurowany — funkcje uwierzytelniania są wyłączone") → sign-up/sign-in are currently non-functional
-- **Deploy / infra:** present — `wrangler.jsonc` already in Workers format; GitHub Actions CI auto-deploys to Cloudflare Workers on push to `master` via `wrangler-action@v3`; already deployed once per commit history
-- **Observability:** absent — no logging or error-tracking library in code; only Cloudflare's built-in `observability.enabled` flag is on
+- **Frontend:** present — Astro 6 + React 19 islands + Tailwind 4 + shadcn/ui; recipe pages, dashboard, auth pages all shipped
+- **Backend / API:** present — `src/pages/api/recipes/*` (CRUD, trash, restore, type) and `src/pages/api/auth/*`, both fully wired
+- **Data:** present — 11 migrations landed: recipe schema, photo bucket, extraction attempts, instructions, RLS/ownership hardening
+- **Auth:** present — Supabase SSR wired end-to-end; `src/middleware.ts` protects `/recipes`; fully functional (M-01's baseline gap is resolved)
+- **Deploy / infra:** present — `wrangler.jsonc` + `.github/workflows/ci.yml` auto-deploys to Cloudflare Workers on push to `main`
+- **Observability:** absent — still no logging/error-tracking library in code (Parked below; unchanged since M-01)
 
 ## Foundations
+
+No new Foundations for M-02 — every layer S-05 and S-06 touch (data query logic, frontend fetch/render) is already present per Baseline above. F-01 and F-02 below are M-01's foundations, carried forward for PRD-coverage and dependency-graph continuity.
 
 ### F-01: Supabase auth configuration
 
@@ -138,6 +154,31 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Risk:** Low technical risk — additive `instructions text` column, one extra `edit_recipe()` RPC parameter (kept additive via `default null`), matching UI patterns in three existing components. No remaining sequencing risk.
 - **Status:** done
 
+### S-05: Fix Polish ingredient search
+
+- **Outcome:** user can find a recipe by any grammatical form of a Polish ingredient name — searching "cukier" (nominative) also matches a recipe storing "cukru" (genitive, e.g. "łyżka cukru"), and likewise for other common declension patterns (e.g. "masło" → "masła").
+- **Change ID:** fix-polish-ingredient-search
+- **PRD refs:** FR-015 (must-have — ingredient search, independently-addressable ingredient constraint), US-02
+- **Prerequisites:** S-02 (the existing search implementation this fixes)
+- **Parallel with:** S-06
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Polish declension has many irregular forms; a naive prefix-truncation fix was already considered and rejected during M-01 manual testing as too imprecise (false positives on short words, doesn't handle vowel alternation like masło→masła). A real fix needs actual stemming/lemmatization, which is more effort than a typical bug fix — flagging so `/10x-plan` scopes it as such rather than a one-line patch.
+- **Status:** ready
+
+### S-06: Fix recipe list staleness after save
+
+- **Outcome:** user sees a just-saved recipe in their collection immediately after navigating back to it from `/recipes/new` — no manual refresh needed.
+- **Change ID:** fix-recipe-list-staleness
+- **PRD refs:** FR-013 (must-have — collection screen shows all saved recipes), US-01
+- **Prerequisites:** S-01 (the save flow), S-02 (the collection/browse view this affects)
+- **Parallel with:** S-05
+- **Blockers:** —
+- **Unknowns:**
+  - Root cause not yet confirmed — candidates are a fetch-once-on-mount pattern with no refetch-on-navigation, a caching layer, or Astro page/data caching. Owner: builder, investigate during planning. Block: no — a `/10x-frame` pass is recommended before `/10x-plan` given the cause is unconfirmed, but this doesn't block roadmap sequencing.
+- **Risk:** Undiagnosed root cause means the fix's actual size is unknown until investigated — could be a one-line refetch trigger or a deeper caching-strategy change. The symptom directly touches the PRD guardrail "a saved recipe must never disappear... after a successful save confirmation" (it doesn't actually disappear, but looks like it did), which is why this is sequenced alongside S-05 rather than parked.
+- **Status:** ready
+
 ## Backlog Handoff
 
 | Roadmap ID | Change ID                | Suggested issue title                           | Ready for `/10x-plan` | Notes                                      |
@@ -148,6 +189,8 @@ Foundations below assume these are present and do NOT re-scaffold them.
 | S-02       | recipe-search-and-browse | Recipe ingredient search + type filter + detail   | done                   | Merged to `main` 2026-08-16; archived to `context/archive/2026-08-16-recipe-search-and-browse/` |
 | S-03       | recipe-edit-and-remove   | Edit recipe + reversible removal                  | yes                    | S-01 done; recovery window resolved (30 days, Open Roadmap Question 2); implementation + impl-review complete in worktree `cookbook_recipe-edit-and-remove` (branch `feature/recipe-edit-and-remove`); resolving merge conflicts against `main` (introduced by S-02 landing first — both branches touched `src/pages/recipes/[id].astro`) as of 2026-08-16 |
 | S-04       | recipe-prep-instructions | Capture and show recipe preparation instructions  | planned                | Full 7-phase plan (backend + detail view + edit form + prod rollout) ready 2026-08-16, after S-02 + S-03 merged same day. `/10x-implement recipe-prep-instructions phase 1` is safe to start. |
+| S-05       | fix-polish-ingredient-search | Fix Polish ingredient search (grammatical-case variants) | yes           | North star of M-02. `/10x-plan fix-polish-ingredient-search` is safe to start. |
+| S-06       | fix-recipe-list-staleness | Fix stale recipe list after save                  | yes                     | Recommend a `/10x-frame` pass first — root cause unconfirmed (fetch-once-on-mount vs. caching layer vs. Astro page caching). |
 
 ## Open Roadmap Questions
 
@@ -156,8 +199,10 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ## Candidate Ideas (unplanned)
 
-> Surfaced during S-01 manual testing (2026-08-16). Not yet triaged into Slices — not scoped,
-> not estimated. Candidates for a future `/10x-shape` or `/10x-plan` pass.
+> Surfaced during S-01/S-02/S-04 manual testing (2026-08-16 to 2026-08-17). Not yet triaged into
+> Slices — not scoped, not estimated. Candidates for a future `/10x-shape` or `/10x-plan` pass.
+> Two items originally listed here (the Polish ingredient-search bug and the stale-recipe-list
+> bug) were promoted into M-02 as S-05 and S-06 — see `## Slices` above.
 
 - **[Feature] Dashboard — favorite recipes** — let users mark/star recipes as favorites and
   surface them on the dashboard. Depends on S-02 existing (a collection view to favorite from).
@@ -190,21 +235,6 @@ Foundations below assume these are present and do NOT re-scaffold them.
   storage/signed-URL logic in `recipe-query.ts`, the upload flow (`PhotoUploadForm.tsx`), and
   the detail page. Needs a `/10x-shape` pass before scoping — meaningfully bigger than a single
   Slice-sized tweak.
-- **[Bug] Ingredient search misses Polish grammatical-case variants** — surfaced during S-02
-  manual testing (2026-08-16). Search (`FR-015`) is a plain substring `ilike` match with no
-  stemming/lemmatization, so it fails whenever the searched word and the stored word differ by
-  Polish noun declension: "cukier" (nominative) doesn't match an ingredient stored as "cukru"
-  (genitive, e.g. "łyżka cukru"), "masło" doesn't match "masła", etc. — a very common pattern in
-  real Polish recipe text, so this meaningfully undercuts US-02's "find by ingredient" promise.
-  A real fix needs Polish stemming/lemmatization applied to both the stored ingredient text and
-  the search query before comparing (a rule-based suffix-stripping stemmer, or a small
-  dictionary-backed lemmatizer) — not a simple patch. A naive fix (e.g. truncating both sides to
-  a short prefix before comparing) was considered and rejected: it's imprecise, raises false
-  positives on short unrelated words, and doesn't handle vowel-alternation cases (masło→masła)
-  that aren't pure suffix truncation. Touches `src/lib/services/recipe-query.ts`'s `listRecipes`
-  ilike construction, and possibly the extraction/storage side too if normalizing at write-time
-  turns out to be part of the chosen approach. Needs a `/10x-shape` or `/10x-plan` pass to
-  choose an approach before implementing.
 - **[Feature] Paginate/lazy-load the recipe collection instead of a flat 200-row cap** —
   surfaced during S-02 manual testing (2026-08-16). `listRecipes()` currently fetches up to 200
   rows in one request (`src/lib/services/recipe-query.ts`), and `RecipeBrowser.tsx` renders the
@@ -225,13 +255,6 @@ Foundations below assume these are present and do NOT re-scaffold them.
   thumbnail. Likely also worth showing a thumbnail in the recipe list (`RecipeBrowser.tsx`)
   and/or a local preview of the picked file before upload, but the confirmation-card case is the
   one directly reported. Needs a `/10x-plan` pass to scope which surface(s).
-- **[Bug] Recipe list doesn't reflect a just-added recipe after navigating back to it** —
-  surfaced during S-04 manual testing (2026-08-17). After adding a recipe from `/recipes/new`
-  and navigating to the recipe list (`/recipes`), the new recipe doesn't appear — root cause not
-  yet investigated (candidates: `RecipeBrowser.tsx` fetching once on mount with no refetch-on-
-  navigation, a caching layer, or Astro page/data caching on `/recipes`). Needs reproduction and
-  root-cause investigation — likely a `/10x-frame` pass first given the cause is unconfirmed —
-  before scoping a fix.
 
 ## Parked
 
@@ -249,6 +272,10 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Social login (OAuth)** — Why parked: PRD says email + password only at launch.
 - **Observability infrastructure** — Why parked: no launch-blocking NFR names it, and under a speed goal it isn't on the must-have path; `wrangler tail` covers live debugging for now. Revisit before the first real production incident.
 - **Ingredient quantities as a separate field** (`quantity`/`unit` columns on `recipe_ingredients`) — Why parked: framed via `/10x-frame` (2026-08-16, HIGH confidence) as a deliberate S-01 design choice, not a bug — the extraction prompt explicitly says "keep quantities if present" to match F-02's single-column schema, and FR-015's independent-addressability requirement is satisfied at the ingredient-row level already. No current FR needs quantity as structured data. Revisit if FR-011 (per-ingredient annotations) or an ingredient-scaling feature is ever picked up. See `context/changes/recipe-ingredient-quantities/frame.md`.
+
+## Milestone History
+
+- **M-01: Core recipe capture-and-discovery loop** (`core-recipe-loop`) — closed 2026-08-25. Photo → AI extraction → save, search/browse, edit/reversible-remove, and prep-instructions all shipped and archived; the full photo → save → find loop validated end-to-end in Polish.
 
 ## Done
 
